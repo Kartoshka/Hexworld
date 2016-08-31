@@ -29,6 +29,8 @@ public class Generate : MonoBehaviour {
     List<GameObject> temp;
     [SerializeField]
     private List<Chunk> chunks;
+
+    /*
     // Use this for initialization
     public void Populate() {
         Clear();
@@ -126,6 +128,7 @@ public class Generate : MonoBehaviour {
         }
 
     }
+    */
 
     public Chunk getChunk(Vector3 center, Vector2 offset, int size, int maxNumBlocks)
     {
@@ -219,6 +222,7 @@ public class Generate : MonoBehaviour {
                             hObj = (GameObject)Instantiate(hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
                             hObj.transform.SetParent(holder.transform);
                             result.hexObjs.Add(hObj);
+                            scaleUV(hObj);
 
                             hObj.transform.localScale = new Vector3(1, 1, numBlocks * blockSize);
                             hObj.transform.localPosition = new Vector3(blockX, blockHeight * blockSize, j * 1.5f + deltaZ);
@@ -238,6 +242,7 @@ public class Generate : MonoBehaviour {
                     hObj = (GameObject)Instantiate(hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
                     result.hexObjs.Add(hObj);
                     hObj.transform.SetParent(holder.transform);
+                    scaleUV(hObj);
 
                     hObj.transform.localScale = new Vector3(1, 1, numBlocks * blockSize);
                     hObj.transform.localPosition = new Vector3(blockX, blockHeight * blockSize, j * 1.5f + deltaZ);
@@ -257,22 +262,20 @@ public class Generate : MonoBehaviour {
         Vector3[] vertices = mesh.vertices;
         Vector2[] uvs = new Vector2[vertices.Length];
 
-        //Debug.Log("Next Mesh");
+        //Debug.Log("--Next Mesh--");
 
         for (int i = 0; i < uvs.Length; i++)
         {
+            uvs[i] = mesh.uv[i];
             //Debug.Log(mesh.uv[i]);
-            uvs[i][0] = mesh.uv[i][0];
+            //uvs[i][0] = mesh.uv[i][0];
 
-            if (mesh.uv[i][1] == 0.5 && (mesh.uv[i][0] == 0.0 || mesh.uv[i][0] == 0.5))
+
+            if (i == 2 || i == 3)
             {
-                uvs[i][1] = 0.5f * obj.transform.localScale[2];
-                //uvs[i][1] = mesh.uv[i][1] * 50;
-            }
-            else
-            {
-                uvs[i][0] = mesh.uv[i][0];
-                uvs[i][1] = mesh.uv[i][1];
+                //Debug.Log("Change");
+                //uvs[i][1] = 0.5f * obj.transform.localScale[2];
+                uvs[i][1] = mesh.uv[i][1] * 50;
             }
         }
 
