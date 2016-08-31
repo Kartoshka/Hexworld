@@ -5,6 +5,7 @@ using NoiseTest;
 
 public class Generate : MonoBehaviour {
 
+    public GameObject source;
     public GameObject hexObj;
     public AnimationCurve curve;
     public AnimationCurve curve2;
@@ -126,7 +127,7 @@ public class Generate : MonoBehaviour {
 
     }
 
-    public Chunk getChunk(Vector2 center, int size, int maxNumBlocks)
+    public Chunk getChunk(Vector3 center, Vector2 offset, int size, int maxNumBlocks)
     {
         GameObject holder = new GameObject("Holder of chunk of size " + size);
         if (chunks == null)
@@ -135,17 +136,17 @@ public class Generate : MonoBehaviour {
         }
 
        
-        center.x = center.x * (float)size * Mathf.Sqrt(0.75f) * 2f;
-        center.y = center.y* (float)size * 1.5f;
+        offset.x = offset.x * (float)size * Mathf.Sqrt(0.75f) * 2f + center.x;
+        offset.y = offset.y* (float)size * 1.5f + center.z;
 
         //Offset of a chunk centered at (0,0) with given size from our center
-        float deltaX = center.x - Mathf.FloorToInt(((float)size) * 0.5f) * Mathf.Sqrt(0.75f) * 2f;
-        float deltaZ = center.y - Mathf.FloorToInt(((float)size) * 0.5f) * 1.5f;
+        float deltaX = offset.x - Mathf.FloorToInt(((float)size) * 0.5f) * Mathf.Sqrt(0.75f) * 2f;
+        float deltaZ = offset.y - Mathf.FloorToInt(((float)size) * 0.5f) * 1.5f;
 
         //Initialize our chunk
         Chunk result = new Chunk();
         result.hexObjs = new List<GameObject>();
-        result.center = center;
+        result.center = offset;
         result.size = 16;
 
         float sum = 0;
