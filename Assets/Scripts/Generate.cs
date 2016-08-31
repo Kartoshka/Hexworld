@@ -134,13 +134,8 @@ public class Generate : MonoBehaviour {
             chunks = new List<Chunk>();
         }
 
-        if (center.y % 2 == 0)
-        {
-            center.x = center.x * (float)size * Mathf.Sqrt(0.75f) * 2f;
-        }
-        else {
-            center.x = center.x * (float)size * Mathf.Sqrt(0.75f) * 2f -Mathf.Sqrt(0.75f);
-        }
+       
+        center.x = center.x * (float)size * Mathf.Sqrt(0.75f) * 2f;
         center.y = center.y* (float)size * 1.5f;
 
         //Offset of a chunk centered at (0,0) with given size from our center
