@@ -90,8 +90,9 @@ public class Generate : MonoBehaviour {
 
 							hObj = (GameObject)Instantiate (hexObj, new Vector3 (0, 0, 0), hexObj.transform.rotation);
 							temp.Add(hObj);
+                            scaleUV(hObj);
 
-							hObj.transform.localScale = new Vector3 (1, 1, numBlocks * blockSize);
+                            hObj.transform.localScale = new Vector3 (1, 1, numBlocks * blockSize);
 							hObj.transform.localPosition = new Vector3 (i * 0.866f * 2.0f + (j % 2) * 0.866f, blockHeight * blockSize, j * 1.5f);
 
 							contBlock = false;
@@ -105,6 +106,7 @@ public class Generate : MonoBehaviour {
 				if (contBlock && numBlocks != 0) {
 					hObj = (GameObject)Instantiate (hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
 					temp.Add(hObj);
+                    scaleUV(hObj);
 
 					hObj.transform.localScale = new Vector3(1, 1, numBlocks*blockSize);
 					hObj.transform.localPosition = new Vector3 (i*0.866f*2.0f + (j%2)*0.866f, blockHeight*blockSize, j * 1.5f);
@@ -117,6 +119,32 @@ public class Generate : MonoBehaviour {
 		}
 	
 	}
+
+    //Scale the UV coordinates of a block's mesh, sort of works but something's weird
+    public void scaleUV(GameObject obj) {
+        Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+        Vector3[] vertices = mesh.vertices;
+        Vector2[] uvs = new Vector2[vertices.Length];
+
+        //Debug.Log("Next Mesh");
+
+        for (int i = 0; i < uvs.Length; i++) {
+            //Debug.Log(mesh.uv[i]);
+            uvs[i][0] = mesh.uv[i][0];
+
+            if (mesh.uv[i][1] == 0.5 && (mesh.uv[i][0] == 0.0 || mesh.uv[i][0] == 0.5))
+            {
+                uvs[i][1] = 0.5f * obj.transform.localScale[2];
+                //uvs[i][1] = mesh.uv[i][1] * 50;
+            }
+            else {
+                uvs[i][0] = mesh.uv[i][0];
+                uvs[i][1] = mesh.uv[i][1];
+            }
+        }
+
+        mesh.uv = uvs;
+    }
 	
 	// Update is called once per frame
 	public void Clear () {
