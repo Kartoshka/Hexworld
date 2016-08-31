@@ -7,44 +7,51 @@ public class Generate : MonoBehaviour {
 
 	public GameObject hexObj;
 	public AnimationCurve curve;
+    public AnimationCurve curve2;
 
-	//public int interpolationDistance=8;
-	//TrilinearInterpolation interpolator;
+    //public int interpolationDistance=8;
+    //TrilinearInterpolation interpolator;
 
-	public int size;
+    public int size;
 	public int maxNumBlocks;
-
+    public float blockSize = 0.25f;
 	public long gameSeed;
 
-	readonly int smallestInterpolation = 4;
-	readonly int levels = 6;
-	private long[] octaveSeeds = {57131, 16447, 25999, 40591, 38557, 63629 };
-	readonly float[] octaveWeights = {1f, 1.5f, 4f, 6f, 9f, 15f};
-	private TrilinearInterpolation[] interpolators = new TrilinearInterpolation[6];
+	
+    
+    public int[] octaveDistances;
+    public float[] octaveWeights;
+    public long[] octaveSeeds;
+
+	private TrilinearInterpolation[] interpolators;
 
 	public float pScale;
-
+    public float pScale2;
 
 	List<GameObject> temp;
 	// Use this for initialization
 	public void Populate () {
 		Clear ();
-		//int size = 16;
-		float blockSize = 0.25f;
-		//maxNumBlocks = 64;
-		//float spawnThresh = 0.35f;
+
 		float sum = 0;
 		foreach (float f in octaveWeights) {
 			sum += f;
 		}
+
+        interpolators = new TrilinearInterpolation[octaveDistances.Length];
+
 		for (int d = 0; d < interpolators.Length; d++) {
-			interpolators [d] = new TrilinearInterpolation (gameSeed*octaveSeeds[d], (int)(smallestInterpolation*Mathf.Pow(2f, (float)d)));
+			interpolators [d] = new TrilinearInterpolation (gameSeed*octaveSeeds[d], octaveDistances[d]);
 		}
 
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
 
-				bool contBlock = false;
+                float blockX = i * 0.866f * 2.0f + (j % 2) * 0.866f;
+                float blockZ = j * 1.5f;
+
+
+                bool contBlock = false;
 				int numBlocks = 0;
 				int blockHeight = 0;
 				GameObject hObj;
@@ -55,20 +62,20 @@ public class Generate : MonoBehaviour {
 					float chanceOfBlock = 0.0f;
 
 					for (int oct = 0; oct < interpolators.Length; oct++) {
-						chanceOfBlock += interpolators [oct].trilinearInterpolation(i * 0.866f * 2.0f + (j % 2) * 0.866f, (float)b*blockSize, j * 1.5f)*octaveWeights[oct];
+						chanceOfBlock += interpolators [oct].trilinearInterpolation(blockX, (float)b*blockSize, blockZ)*octaveWeights[oct];
 					}
 
 					chanceOfBlock = chanceOfBlock / (sum);
 
-					//float chanceOfBlock = interpolator.trilinearInterpolation(i * 0.866f * 2.0f + (j % 2) * 0.866f, (float)b*blockSize, j * 1.5f);
-					//if (chanceOfBlock < spawnThresh) {
+                    float perlinValue = Mathf.PerlinNoise(blockX * pScale, blockZ * pScale);
+                    float perlinValue2 = Mathf.PerlinNoise((blockX+456456) * pScale2, (blockZ+12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
+                    //if (b*blockSize < perlinValue*30) {
+                    float heightFactor = ((float)b / maxNumBlocks) - (perlinValue2*0.25f);
 
-					float x = i * 0.866f * 2.0f + (j % 2) * 0.866f;
-					float y = j * 1.5f;
-					//float pScale = 0.025f;
+                    float combinedCurveValue = (perlinValue* curve.Evaluate(heightFactor)) + ((1.0f - perlinValue) * curve2.Evaluate(heightFactor)); //Mixing two curves based on noise
+                    combinedCurveValue = curve.Evaluate(heightFactor); //Original curve
 
-					//if (b*blockSize < (Mathf.PerlinNoise(x*pScale , y*pScale)*30f)) {
-					if (chanceOfBlock < curve.Evaluate((float)b/(float)maxNumBlocks)* (Mathf.PerlinNoise(x*pScale , y*pScale))) {
+                    if (chanceOfBlock < combinedCurveValue) {
 						if (contBlock) {
 							//increment curent block height
 							numBlocks++;
