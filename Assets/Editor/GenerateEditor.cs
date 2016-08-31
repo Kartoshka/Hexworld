@@ -9,9 +9,11 @@ public class GenerateEditor : Editor {
     {
         base.OnInspectorGUI();
         Generate generator = (Generate)target;
+        /*
         if (GUILayout.Button("Generate new thingy mabober")) {
             generator.Populate();
         }
+        */
         if (GUILayout.Button("Generate chunk at pos")) {
             generator.getChunk(generator.centerChunk, generator.size, generator.maxNumBlocks);
         }
