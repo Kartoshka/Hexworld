@@ -260,6 +260,9 @@ public class Generate : MonoBehaviour {
     //Scale the UV coordinates of a block's mesh, sort of works but something's weird
     public void scaleUV(GameObject obj)
     {
+
+        obj.GetComponent<MeshFilter>().sharedMesh = Instantiate(obj.GetComponent<MeshFilter>().sharedMesh);
+        //obj.GetComponent<MeshFilter>().sharedMesh = (Mesh)Instantiate(obj.GetComponent<MeshFilter>().sharedMesh);
         Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
         Vector3[] vertices = mesh.vertices;
         Vector2[] uvs = new Vector2[vertices.Length];
@@ -286,6 +289,7 @@ public class Generate : MonoBehaviour {
         }
 
         mesh.uv = uvs;
+        
     }
 
     public void Clear()
