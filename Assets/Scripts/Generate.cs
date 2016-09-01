@@ -5,6 +5,11 @@ using NoiseTest;
 
 public class Generate : MonoBehaviour {
 
+    //Along x axis
+    private float xDistanceBlocks = 0.866025f * 2f;
+    //Along z axis, distance between blocks
+    private float zDistanceBlocks = 1.5f;
+    #region Generation Information
     public GameObject source;
     public GameObject hexObj;
     public AnimationCurve curve;
@@ -138,9 +143,11 @@ public class Generate : MonoBehaviour {
             chunks = new List<Chunk>();
         }
 
-       
-        offset.x = offset.x * (float)size * Mathf.Sqrt(0.75f) * 2f + center.x;
-        offset.y = offset.y* (float)size * 1.5f + center.z;
+        center.x = Mathf.FloorToInt(center.x / (size * xDistanceBlocks*0.5f));
+        center.z = Mathf.FloorToInt(center.z / (size * zDistanceBlocks*0.5f));
+
+        offset.x = offset.x * (float)size * Mathf.Sqrt(0.75f) * 2f + center.x * (size * xDistanceBlocks);
+        offset.y = offset.y * (float)size * 1.5f + center.z * (size * zDistanceBlocks);
 
         //Offset of a chunk centered at (0,0) with given size from our center
         float deltaX = offset.x - Mathf.FloorToInt(((float)size) * 0.5f) * Mathf.Sqrt(0.75f) * 2f;
@@ -149,8 +156,8 @@ public class Generate : MonoBehaviour {
         //Initialize our chunk
         Chunk result = new Chunk();
         result.hexObjs = new List<GameObject>();
-        result.center = offset;
-        result.size = 16;
+        result.center = new Vector2(center.x, center.z);
+        result.size = size;
 
         float sum = 0;
         foreach (float f in octaveWeights)
@@ -305,6 +312,7 @@ public class Generate : MonoBehaviour {
                 }
             }
         }
+        chunks = new List<Chunk>();
         //interpolator = new TrilinearInterpolation(interpolationDistance);
     }
 
@@ -316,79 +324,132 @@ public class Generate : MonoBehaviour {
     }
 
 
-	private class TrilinearInterpolation{
-		[SerializeField]
-		private Dictionary<Vector3,float> interpolators;
-		[SerializeField]
-		private OpenSimplexNoise noise;
-		[SerializeField]
-		public int interpolationDistance;
+    private class TrilinearInterpolation {
+        [SerializeField]
+        private Dictionary<Vector3, float> interpolators;
+        [SerializeField]
+        private OpenSimplexNoise noise;
+        [SerializeField]
+        public int interpolationDistance;
 
 
-		public TrilinearInterpolation(int distanceInterpolation):this(System.DateTime.Now.Ticks,distanceInterpolation){
-		
-		}
-		public TrilinearInterpolation(long seed, int distanceInterpolation){
-			noise = new OpenSimplexNoise(seed);
-			this.interpolationDistance = distanceInterpolation;
-			interpolators = new Dictionary<Vector3, float>();
-		}
+        public TrilinearInterpolation(int distanceInterpolation) : this(System.DateTime.Now.Ticks, distanceInterpolation) {
+
+        }
+        public TrilinearInterpolation(long seed, int distanceInterpolation) {
+            noise = new OpenSimplexNoise(seed);
+            this.interpolationDistance = distanceInterpolation;
+            interpolators = new Dictionary<Vector3, float>();
+        }
 
 
-		private float getInterpolation(int x, int y, int z){
-			if (interpolators == null) {
-				interpolators = new Dictionary<Vector3, float> ();
-			}
-			if (noise == null) {
-				noise = new OpenSimplexNoise ();
-			}
-			float result;
-			if (!interpolators.TryGetValue (new Vector3 (x, y, z), out result)) {
-				result = (float)noise.Evaluate (x, y, z);
-				interpolators.Add (new Vector3 (x, y, z), result);
-			}
+        private float getInterpolation(int x, int y, int z) {
+            if (interpolators == null) {
+                interpolators = new Dictionary<Vector3, float>();
+            }
+            if (noise == null) {
+                noise = new OpenSimplexNoise();
+            }
+            float result;
+            if (!interpolators.TryGetValue(new Vector3(x, y, z), out result)) {
+                result = (float)noise.Evaluate(x, y, z);
+                interpolators.Add(new Vector3(x, y, z), result);
+            }
 
-			return result;
-		}
+            return result;
+        }
 
-		//http://paulbourke.net/miscellaneous/interpolation/
-		public float trilinearInterpolation(float x, float y, float z){
+        //http://paulbourke.net/miscellaneous/interpolation/
+        public float trilinearInterpolation(float x, float y, float z) {
 
-			if (x % interpolationDistance == 0 && y % interpolationDistance == 0 && z % interpolationDistance == 0) {
-				return getInterpolation ((int)x, (int)y, (int)z);
-			}
+            if (x % interpolationDistance == 0 && y % interpolationDistance == 0 && z % interpolationDistance == 0) {
+                return getInterpolation((int)x, (int)y, (int)z);
+            }
 
-			int minX = Mathf.FloorToInt((Mathf.Floor (x) / (float)interpolationDistance))*interpolationDistance;
-			int minY = Mathf.FloorToInt((Mathf.Floor (y) / (float)interpolationDistance))*interpolationDistance; 
-			int minZ = Mathf.FloorToInt((Mathf.Floor (z) / (float)interpolationDistance))*interpolationDistance;
+            int minX = Mathf.FloorToInt((Mathf.Floor(x) / (float)interpolationDistance)) * interpolationDistance;
+            int minY = Mathf.FloorToInt((Mathf.Floor(y) / (float)interpolationDistance)) * interpolationDistance;
+            int minZ = Mathf.FloorToInt((Mathf.Floor(z) / (float)interpolationDistance)) * interpolationDistance;
 
-			int maxX = minX + interpolationDistance;
-			int maxY = minY + interpolationDistance;
-			int maxZ = minZ + interpolationDistance;
+            int maxX = minX + interpolationDistance;
+            int maxY = minY + interpolationDistance;
+            int maxZ = minZ + interpolationDistance;
 
-			float V000 = getInterpolation (minX, minY, minZ);
-			float V100 = getInterpolation (maxX, minY, minZ);
-			float V010 = getInterpolation (minX, maxY, minZ);  
-			float V001 = getInterpolation (minX, minY, maxZ);
-			float V101 = getInterpolation (maxX, minY, maxZ);
-			float V011 = getInterpolation (minX, maxY, maxZ);
-			float V110 = getInterpolation (maxX, maxY, minZ);
-			float V111 = getInterpolation (maxX, maxY, maxZ);
+            float V000 = getInterpolation(minX, minY, minZ);
+            float V100 = getInterpolation(maxX, minY, minZ);
+            float V010 = getInterpolation(minX, maxY, minZ);
+            float V001 = getInterpolation(minX, minY, maxZ);
+            float V101 = getInterpolation(maxX, minY, maxZ);
+            float V011 = getInterpolation(minX, maxY, maxZ);
+            float V110 = getInterpolation(maxX, maxY, minZ);
+            float V111 = getInterpolation(maxX, maxY, maxZ);
 
-			float localX = (x - minX)/interpolationDistance;
-			float localY = (y - minY)/interpolationDistance;
-			float localZ = (z - minZ)/interpolationDistance;
+            float localX = (x - minX) / interpolationDistance;
+            float localY = (y - minY) / interpolationDistance;
+            float localZ = (z - minZ) / interpolationDistance;
 
 
-			return  V000 *(1 - localX) * (1 - localY)* (1 - localZ) +
-				V100 * localX * (1 - localY)* (1 - localZ ) + 
-				V010 *(1 - localX) *localY* (1 - localZ) + 
-				V001 *(1 - localX) *(1 - localY) *localZ +
-				V101 * localX * (1 - localY) *localZ + 
-				V011 *(1 - localX) * localY *localZ + 
-				V110 *localX* localY* (1 - localZ) + 
-				V111 *localX *localY *localZ;
-		}
+            return V000 * (1 - localX) * (1 - localY) * (1 - localZ) +
+                V100 * localX * (1 - localY) * (1 - localZ) +
+                V010 * (1 - localX) * localY * (1 - localZ) +
+                V001 * (1 - localX) * (1 - localY) * localZ +
+                V101 * localX * (1 - localY) * localZ +
+                V011 * (1 - localX) * localY * localZ +
+                V110 * localX * localY * (1 - localZ) +
+                V111 * localX * localY * localZ;
+        }
 
-	}
+    }
+    #endregion
+
+    #region Runtime chunk management
+    [Tooltip("Number of blocks away from center loaded. Total number of chunks loaded is equal to (2*radius +1)^2")]
+    public int radius;
+
+    Dictionary<Vector2, Chunk> loadedChunks;
+    private Vector2 currentChunk;
+
+    //Called whenever object is enabled on runtime
+    public void Start()
+    {
+        loadedChunks = new Dictionary<Vector2, Chunk>();
+        Chunk firstChunk = getChunk(source.transform.position, new Vector2(0, 0), size, maxNumBlocks);
+        currentChunk.x = firstChunk.center.x;
+        currentChunk.y = firstChunk.center.x;
+
+        loadedChunks.Add(currentChunk, firstChunk);
+        verifySurroundings();
+
+    }
+
+    public void LateUpdate()
+    {
+        int x = Mathf.FloorToInt(source.transform.position.x / size * xDistanceBlocks);
+        int z = Mathf.FloorToInt(source.transform.position.z / size * zDistanceBlocks);
+
+        if (x != currentChunk.x || z != currentChunk.y)
+        {
+            currentChunk.x = x;
+            currentChunk.y = z;
+
+            verifySurroundings();
+        }
+    }
+
+    private void verifySurroundings() {
+        int startX = (int)this.currentChunk.x - (radius);
+        int startZ = (int)this.currentChunk.y - (radius);
+
+        int squareSize = 2 * radius + 1;
+        for (int i = 0; i < squareSize; i++)
+        {
+            for (int k = 0; k < squareSize; k++)
+            {
+                if (!loadedChunks.ContainsKey(new Vector2(startX + i, startZ + k))) {
+                    loadedChunks.Add((new Vector2(startX + i, startZ + k)), getChunk(new Vector3((startX + i) * xDistanceBlocks, 0, (startZ + k) * zDistanceBlocks), new Vector2(0, 0), size, maxNumBlocks));
+                    Debug.Log((new Vector2(startX + i, startZ + k)));
+                }
+            }
+        }
+    }
+    #endregion
 }

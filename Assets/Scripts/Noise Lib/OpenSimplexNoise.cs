@@ -198,7 +198,6 @@ namespace NoiseTest
 
         public OpenSimplexNoise(long seed)
         {
-			Debug.Log (seed);
             perm = new byte[256];
             perm2D = new byte[256];
             perm3D = new byte[256];
