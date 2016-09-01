@@ -6,7 +6,7 @@ using NoiseTest;
 public class Generate : MonoBehaviour {
 
     //Along x axis
-    private float xDistanceBlocks = 0.866025f * 2f;
+    private float xDistanceBlocks = 0.866f * 2f;
     //Along z axis, distance between blocks
     private float zDistanceBlocks = 1.5f;
     #region Generation Information
@@ -15,7 +15,7 @@ public class Generate : MonoBehaviour {
     public AnimationCurve curve;
     public AnimationCurve curve2;
 
-    public Vector2 centerChunk;
+    public Vector2 chunkPosition;
     public int size;
     public int maxNumBlocks;
     public float blockSize = 0.25f;
@@ -35,107 +35,9 @@ public class Generate : MonoBehaviour {
     [SerializeField]
     private List<Chunk> chunks;
 
-    /*
-    // Use this for initialization
-    public void Populate() {
-        Clear();
+    
 
-        float sum = 0;
-        foreach (float f in octaveWeights) {
-            sum += f;
-        }
-
-        interpolators = new TrilinearInterpolation[octaveDistances.Length];
-
-        for (int d = 0; d < interpolators.Length; d++) {
-            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
-        }
-
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-
-                float blockX = i * 0.866f * 2.0f + (j % 2) * 0.866f;
-                float blockZ = j * 1.5f;
-
-
-                bool contBlock = false;
-                int numBlocks = 0;
-                int blockHeight = 0;
-                GameObject hObj;
-                for (int b = 0; b < maxNumBlocks; b++) {
-                    //Get interpolated sample value, random number and threshold function temporary
-                    //float chanceOfBlock = Random.Range(0, 1.0f);
-
-                    float chanceOfBlock = 0.0f;
-
-                    for (int oct = 0; oct < interpolators.Length; oct++) {
-                        chanceOfBlock += interpolators[oct].trilinearInterpolation(blockX, (float)b * blockSize, blockZ) * octaveWeights[oct];
-                    }
-
-                    chanceOfBlock = chanceOfBlock / (sum);
-
-                    float perlinValue = Mathf.PerlinNoise(blockX * pScale, blockZ * pScale);
-                    float perlinValue2 = Mathf.PerlinNoise((blockX + 456456) * pScale2, (blockZ + 12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
-                    float heightFactor = ((float)b / maxNumBlocks) - (perlinValue2 * 0.25f);
-
-                    float combinedCurveValue = (perlinValue * curve.Evaluate(heightFactor)) + ((1.0f - perlinValue) * curve2.Evaluate(heightFactor)); //Mixing two curves based on noise
-
-                    if (chanceOfBlock < combinedCurveValue) {
-                       if (contBlock)
-                        {
-                            //increment curent block height
-                            numBlocks++;
-                        }
-                        else
-                        {
-                            //start new block
-                            contBlock = true;
-                            blockHeight = b;
-                        }
-                    }
-                    else
-                    {
-                        if (contBlock && numBlocks != 0)
-                        {
-                            //spawn block
-
-                            hObj = (GameObject)Instantiate(hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
-                            temp.Add(hObj);
-                            scaleUV(hObj);
-
-                            hObj.transform.localScale = new Vector3(1, 1, numBlocks * blockSize);
-                            hObj.transform.localPosition = new Vector3(i * 0.866f * 2.0f + (j % 2) * 0.866f, blockHeight * blockSize, j * 1.5f);
-
-                            contBlock = false;
-                            numBlocks = 0;
-                        }
-                        else
-                        {
-                            //nothing to be done
-                        }
-                    }
-                }
-
-                if (contBlock && numBlocks != 0)
-                {
-                    hObj = (GameObject)Instantiate(hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
-                    temp.Add(hObj);
-                    scaleUV(hObj);
-
-                    hObj.transform.localScale = new Vector3(1, 1, numBlocks * blockSize);
-                    hObj.transform.localPosition = new Vector3(i * 0.866f * 2.0f + (j % 2) * 0.866f, blockHeight * blockSize, j * 1.5f);
-                }
-
-                //GameObject hObj = (GameObject)Instantiate (hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
-                //hObj.transform.localScale = new Vector3(1, 1, height);
-                //hObj.transform.localPosition = new Vector3 (i*0.866f*2.0f + (j%2)*0.866f, 0, j * 1.5f);
-            }
-        }
-
-    }
-    */
-
-    public Chunk getChunk(Vector3 center, Vector2 offset, int size, int maxNumBlocks)
+    public Chunk getChunk(Vector2 cPos, int size, int maxNumBlocks)
     {
         GameObject holder = new GameObject("Holder of chunk of size " + size);
         if (chunks == null)
@@ -143,20 +45,18 @@ public class Generate : MonoBehaviour {
             chunks = new List<Chunk>();
         }
 
-        center.x = Mathf.FloorToInt(center.x / (size * xDistanceBlocks*0.5f));
-        center.z = Mathf.FloorToInt(center.z / (size * zDistanceBlocks*0.5f));
+        
+        int chunkX = Mathf.FloorToInt(cPos.x);
+        int chunkZ = Mathf.FloorToInt(cPos.y);
 
-        offset.x = offset.x * (float)size * Mathf.Sqrt(0.75f) * 2f + center.x * (size * xDistanceBlocks);
-        offset.y = offset.y * (float)size * 1.5f + center.z * (size * zDistanceBlocks);
-
-        //Offset of a chunk centered at (0,0) with given size from our center
-        float deltaX = offset.x - Mathf.FloorToInt(((float)size) * 0.5f) * Mathf.Sqrt(0.75f) * 2f;
-        float deltaZ = offset.y - Mathf.FloorToInt(((float)size) * 0.5f) * 1.5f;
+        
+        float deltaX = (float)chunkX * (size * xDistanceBlocks);
+        float deltaZ = (float)chunkZ * (size * zDistanceBlocks);
 
         //Initialize our chunk
         Chunk result = new Chunk();
         result.hexObjs = new List<GameObject>();
-        result.center = new Vector2(center.x, center.z);
+        result.pos = new Vector2(chunkX, chunkZ);
         result.size = size;
 
         float sum = 0;
@@ -329,7 +229,7 @@ public class Generate : MonoBehaviour {
     [System.Serializable]
     public struct Chunk {
         public int size;
-        public Vector3 center;
+        public Vector3 pos;
         public List<GameObject> hexObjs;
     }
 
@@ -422,19 +322,24 @@ public class Generate : MonoBehaviour {
     public void Start()
     {
         loadedChunks = new Dictionary<Vector2, Chunk>();
-        Chunk firstChunk = getChunk(source.transform.position, new Vector2(0, 0), size, maxNumBlocks);
-        currentChunk.x = firstChunk.center.x;
-        currentChunk.y = firstChunk.center.x;
+        
+
+        Chunk firstChunk = getChunk(findCurrentChunk(source.transform.position), size, maxNumBlocks);
+        currentChunk.x = firstChunk.pos.x;
+        currentChunk.y = firstChunk.pos.y;
 
         loadedChunks.Add(currentChunk, firstChunk);
+        
+        
         verifySurroundings();
 
     }
 
     public void LateUpdate()
     {
-        int x = Mathf.FloorToInt(source.transform.position.x / size * xDistanceBlocks);
-        int z = Mathf.FloorToInt(source.transform.position.z / size * zDistanceBlocks);
+        Vector2 cc = findCurrentChunk(source.transform.position);
+        int x = (int)cc.x;
+        int z = (int)cc.y;
 
         if (x != currentChunk.x || z != currentChunk.y)
         {
@@ -445,18 +350,29 @@ public class Generate : MonoBehaviour {
         }
     }
 
+    public Vector2 findCurrentChunk(Vector3 sourcePos) {
+        int x = Mathf.FloorToInt(source.transform.position.x / ((float)size * xDistanceBlocks));
+        int z = Mathf.FloorToInt(source.transform.position.z / ((float)size * zDistanceBlocks));
+        //Debug.Log("Source Position: ( " + source.transform.position.x + " , " + source.transform.position.z + " )");
+        //Debug.Log("Current Chunk: ( " + x + " , " + z + " )");
+        return new Vector2(x, z);
+    }
+
     private void verifySurroundings() {
         int startX = (int)this.currentChunk.x - (radius);
         int startZ = (int)this.currentChunk.y - (radius);
 
         int squareSize = 2 * radius + 1;
+
         for (int i = 0; i < squareSize; i++)
         {
             for (int k = 0; k < squareSize; k++)
             {
                 if (!loadedChunks.ContainsKey(new Vector2(startX + i, startZ + k))) {
-                    loadedChunks.Add((new Vector2(startX + i, startZ + k)), getChunk(new Vector3((startX + i) * xDistanceBlocks, 0, (startZ + k) * zDistanceBlocks), new Vector2(0, 0), size, maxNumBlocks));
-                    Debug.Log((new Vector2(startX + i, startZ + k)));
+                    //loadedChunks.Add((new Vector2(startX + i, startZ + k)), getChunk(new Vector3((startX + i) * xDistanceBlocks, 0, (startZ + k) * zDistanceBlocks), new Vector2(0, 0), size, maxNumBlocks));
+                    Chunk newC = getChunk(new Vector2(startX + i, startZ + k), size, maxNumBlocks);
+                    loadedChunks.Add(new Vector2(startX + i, startZ + k), newC);
+                    //Debug.Log((new Vector2(startX + i, startZ + k)));
                 }
             }
         }
