@@ -58,6 +58,7 @@ public class Generate : MonoBehaviour {
         result.hexObjs = new List<GameObject>();
         result.pos = new Vector2(chunkX, chunkZ);
         result.size = size;
+		result.blockTypes = new short[size, size, maxNumBlocks];
 
         float sum = 0;
         foreach (float f in octaveWeights)
@@ -129,7 +130,7 @@ public class Generate : MonoBehaviour {
                             hObj = (GameObject)Instantiate(hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
                             hObj.transform.SetParent(holder.transform);
                             result.hexObjs.Add(hObj);
-                            
+							result.blockTypes [i,j,b] = 1;
 
                             hObj.transform.localScale = new Vector3(1, 1, numBlocks * blockSize);
                             hObj.transform.localPosition = new Vector3(blockX, blockHeight * blockSize, j * 1.5f + deltaZ);
@@ -150,7 +151,7 @@ public class Generate : MonoBehaviour {
                     hObj = (GameObject)Instantiate(hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
                     result.hexObjs.Add(hObj);
                     hObj.transform.SetParent(holder.transform);
-                    
+					result.blockTypes [i,j,maxNumBlocks-1] = 1;
 
                     hObj.transform.localScale = new Vector3(1, 1, numBlocks * blockSize);
                     hObj.transform.localPosition = new Vector3(blockX, blockHeight * blockSize, j * 1.5f + deltaZ);
@@ -232,6 +233,7 @@ public class Generate : MonoBehaviour {
         public int size;
         public Vector3 pos;
         public List<GameObject> hexObjs;
+		public short[,,] blockTypes;
     }
 
 
@@ -332,7 +334,7 @@ public class Generate : MonoBehaviour {
         loadedChunks.Add(currentChunk, firstChunk);
         
         
-        verifySurroundings();
+		StartCoroutine(verifySurroundings());
 
     }
 
@@ -347,9 +349,11 @@ public class Generate : MonoBehaviour {
             currentChunk.x = x;
             currentChunk.y = z;
 
-            verifySurroundings();
+			StartCoroutine(verifySurroundings());
         }
     }
+
+
 
     public Vector2 findCurrentChunk(Vector3 sourcePos) {
         int x = Mathf.FloorToInt(source.transform.position.x / ((float)size * xDistanceBlocks));
@@ -359,7 +363,7 @@ public class Generate : MonoBehaviour {
         return new Vector2(x, z);
     }
 
-    private void verifySurroundings() {
+	private IEnumerator verifySurroundings() {
         int startX = (int)this.currentChunk.x - (radius);
         int startZ = (int)this.currentChunk.y - (radius);
 
@@ -377,6 +381,7 @@ public class Generate : MonoBehaviour {
                 }
             }
         }
+		yield return null;
     }
     #endregion
 }
