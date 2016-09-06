@@ -182,7 +182,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 0
   chunkPosition: {x: 0, y: 0}
-  size: 16
+  size: 4
   maxNumBlocks: 512
   blockSize: 0.25
   gameSeed: 3150
@@ -489,7 +489,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
       propertyPath: m_UseHeadBob
