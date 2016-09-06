@@ -158,13 +158,14 @@ public class Generate : MonoBehaviour {
                 }
             }
         }
+        
 
         chunks.Add(result);
         temp.Add(holder);
         return result;
     }
 
-    //Scale the UV coordinates of a block's mesh, sort of works but something's weird
+    //Scale the UV coordinates of a block's mesh
     public void scaleUV(GameObject obj)
     {
 
