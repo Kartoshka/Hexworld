@@ -118,7 +118,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   source: {fileID: 1597006540}
-  hexObj: {fileID: 1000012078384566, guid: 427c1872be2ccc54dbc9aecfb51bddd0, type: 2}
+  block_stone: {fileID: 1000012078384566, guid: 427c1872be2ccc54dbc9aecfb51bddd0,
+    type: 2}
+  block_dirt: {fileID: 1000013599204602, guid: 71e88e4a53d843b42bd98371eabc6da4, type: 2}
+  block_grass: {fileID: 1000012266192404, guid: 0e41b6d9b95fb4346a66e9d3d8b3dfa2,
+    type: 2}
   curve:
     serializedVersion: 2
     m_Curve:
@@ -182,7 +186,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 0
   chunkPosition: {x: 0, y: 0}
-  size: 4
+  size: 16
   maxNumBlocks: 512
   blockSize: 0.25
   gameSeed: 3150

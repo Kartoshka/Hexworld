@@ -16,7 +16,7 @@ public class GenerateEditor : Editor {
         */
         if (GUILayout.Button("Generate chunk at pos")) {
             //generator.getChunk(generator.chunkPosition, generator.size, generator.maxNumBlocks);
-            generator.getChunk(generator.findCurrentChunk(generator.source.transform.position), generator.size, generator.maxNumBlocks);
+            generator.genInstChunk(generator.findCurrentChunk(generator.source.transform.position), generator.size, generator.maxNumBlocks);
         }
 
 		if (GUILayout.Button ("Clear")) {
