@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using NoiseTest;
+using CielaSpike;
 
 public class Generate : MonoBehaviour {
 
@@ -44,7 +45,6 @@ public class Generate : MonoBehaviour {
         {
             chunks = new List<Chunk>();
         }
-
         
         int chunkX = Mathf.FloorToInt(cPos.x);
         int chunkZ = Mathf.FloorToInt(cPos.y);
@@ -256,7 +256,7 @@ public class Generate : MonoBehaviour {
         }
 
 
-        private float getInterpolation(int x, int y, int z) {
+        private float getPerlinNoise(int x, int y, int z) {
             if (interpolators == null) {
                 interpolators = new Dictionary<Vector3, float>();
             }
@@ -276,7 +276,7 @@ public class Generate : MonoBehaviour {
         public float trilinearInterpolation(float x, float y, float z) {
 
             if (x % interpolationDistance == 0 && y % interpolationDistance == 0 && z % interpolationDistance == 0) {
-                return getInterpolation((int)x, (int)y, (int)z);
+                return getPerlinNoise((int)x, (int)y, (int)z);
             }
 
             int minX = Mathf.FloorToInt((Mathf.Floor(x) / (float)interpolationDistance)) * interpolationDistance;
@@ -287,14 +287,14 @@ public class Generate : MonoBehaviour {
             int maxY = minY + interpolationDistance;
             int maxZ = minZ + interpolationDistance;
 
-            float V000 = getInterpolation(minX, minY, minZ);
-            float V100 = getInterpolation(maxX, minY, minZ);
-            float V010 = getInterpolation(minX, maxY, minZ);
-            float V001 = getInterpolation(minX, minY, maxZ);
-            float V101 = getInterpolation(maxX, minY, maxZ);
-            float V011 = getInterpolation(minX, maxY, maxZ);
-            float V110 = getInterpolation(maxX, maxY, minZ);
-            float V111 = getInterpolation(maxX, maxY, maxZ);
+            float V000 = getPerlinNoise(minX, minY, minZ);
+            float V100 = getPerlinNoise(maxX, minY, minZ);
+            float V010 = getPerlinNoise(minX, maxY, minZ);
+            float V001 = getPerlinNoise(minX, minY, maxZ);
+            float V101 = getPerlinNoise(maxX, minY, maxZ);
+            float V011 = getPerlinNoise(minX, maxY, maxZ);
+            float V110 = getPerlinNoise(maxX, maxY, minZ);
+            float V111 = getPerlinNoise(maxX, maxY, maxZ);
 
             float localX = (x - minX) / interpolationDistance;
             float localY = (y - minY) / interpolationDistance;
