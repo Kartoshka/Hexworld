@@ -200,6 +200,7 @@ MonoBehaviour:
   pScale2: 0.008
   temp: []
   chunks: []
+  optimization: 1
   radius: 1
 --- !u!4 &575319495
 Transform:

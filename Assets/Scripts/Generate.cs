@@ -44,10 +44,9 @@ public class Generate : MonoBehaviour {
     private List<Chunk> chunks;
 
     
-
+	public bool optimization =false;
     public short[,,] genChunk(Vector2 cPos, int size, int maxNumBlocks)
     {
-
         short[,,] blockValues = new short[size, size, maxNumBlocks];
 
         int chunkX = Mathf.FloorToInt(cPos.x);
@@ -77,9 +76,22 @@ public class Generate : MonoBehaviour {
                 float blockX = i * 0.866f * 2.0f + (j % 2) * 0.866f + deltaX;
                 float blockZ = j * 1.5f + deltaZ;
 
-                for (int k = 0; k < maxNumBlocks; k++) {
+				short prev = (short)BLOCKID.Air;
+				int dirtCount = 0;
+
+				for (int k = maxNumBlocks-1; k >=0; k--) {
 
                     float chanceOfBlock = 0.0f;
+
+					float perlinValue = Mathf.PerlinNoise(blockX * pScale, blockZ * pScale);
+					float perlinValue2 = Mathf.PerlinNoise((blockX + 456456) * pScale2, (blockZ + 12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
+					float heightFactor = ((float)k / maxNumBlocks) - (perlinValue2 * 0.25f); //Not sure what this 0.25f is, may or may not be min block height, should be looked into
+					float combinedCurveValue = (perlinValue * curve.Evaluate(heightFactor)) + ((1.0f - perlinValue) * curve2.Evaluate(heightFactor)); //Mixing two curves based on noise
+
+					if (combinedCurveValue <= 0) {
+						blockValues[i, j, k] = (short)BLOCKID.Air;
+						continue;
+					}
 
                     for (int oct = 0; oct < interpolators.Length; oct++)
                     {
@@ -88,185 +100,35 @@ public class Generate : MonoBehaviour {
 
                     chanceOfBlock = chanceOfBlock / (sum);
 
-                    float perlinValue = Mathf.PerlinNoise(blockX * pScale, blockZ * pScale);
-                    float perlinValue2 = Mathf.PerlinNoise((blockX + 456456) * pScale2, (blockZ + 12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
-                    float heightFactor = ((float)k / maxNumBlocks) - (perlinValue2 * 0.25f); //Not sure what this 0.25f is, may or may not be min block height, should be looked into
-
-                    float combinedCurveValue = (perlinValue * curve.Evaluate(heightFactor)) + ((1.0f - perlinValue) * curve2.Evaluate(heightFactor)); //Mixing two curves based on noise
+                    
 
                     if (chanceOfBlock < combinedCurveValue)
                     {
-                        blockValues[i, j, k] = (short)BLOCKID.Stone;
+
+						if (prev == (short)BLOCKID.Air){
+							blockValues[i, j, k] = (short)BLOCKID.Grass;
+						}else if(prev == (short)BLOCKID.Grass || (prev == (short)BLOCKID.Dirt && dirtCount < 5))
+						{
+							blockValues[i, j, k] = (short)BLOCKID.Dirt;
+							dirtCount++;
+						}
+						else {
+							blockValues[i, j, k] = (short)BLOCKID.Stone;
+							dirtCount = 0;
+						}
                     }
                     else {
                         blockValues[i, j, k] = (short)BLOCKID.Air;
-                    }
-                }
-            }
-        }
 
-        //Second pass for dirt/grass
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-
-                short prev = (short)BLOCKID.Air;
-                int dirtCount = 0;
-
-                for (int k = maxNumBlocks - 1; k >= 0; k--) {
-                    //short id = blockValues[i, j, k];
-
-                    if (prev == (short)BLOCKID.Air && blockValues[i, j, k] != (short)BLOCKID.Air) {
-                        blockValues[i, j, k] = (short)BLOCKID.Grass;
-                    }
-                    
-                    if (prev == (short)BLOCKID.Grass || (prev == (short)BLOCKID.Dirt && dirtCount < 5))
-                    {
-                        blockValues[i, j, k] = (short)BLOCKID.Dirt;
-                        dirtCount++;
-                    }
-                    else {
-                        dirtCount = 0;
                     }
                     
                     prev = blockValues[i, j, k];
+
                 }
             }
         }
-
-        return blockValues;
-
-        //Old getChunk function
-        /*
-        GameObject holder = new GameObject("Holder of chunk of size " + size);
-        if (chunks == null)
-        {
-            chunks = new List<Chunk>();
-        }
-        
-        int chunkX = Mathf.FloorToInt(cPos.x);
-        int chunkZ = Mathf.FloorToInt(cPos.y);
-
-        
-        float deltaX = (float)chunkX * (size * xDistanceBlocks);
-        float deltaZ = (float)chunkZ * (size * zDistanceBlocks);
-
-        //Initialize our chunk
-        Chunk result = new Chunk();
-        result.hexObjs = new List<GameObject>();
-        result.pos = new Vector2(chunkX, chunkZ);
-        result.size = size;
-		result.blockTypes = new short[size, size, maxNumBlocks];
-
-        float sum = 0;
-        foreach (float f in octaveWeights)
-        {
-            sum += f;
-        }
-
-        interpolators = new TrilinearInterpolation[octaveDistances.Length];
-
-        for (int d = 0; d < interpolators.Length; d++)
-        {
-            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
-        }
-
-        
-
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
-
-                float blockX = i * 0.866f * 2.0f + (j % 2) * 0.866f + deltaX;
-
-                float blockZ = j * 1.5f + deltaZ;
-
-
-                bool contBlock = false;
-                int numBlocks = 0;
-                int blockHeight = 0;
-                GameObject hObj;
-                for (int b = 0; b < maxNumBlocks; b++)
-                {
-                    //Get interpolated sample value, random number and threshold function temporary
-                    //float chanceOfBlock = Random.Range(0, 1.0f);
-
-                    float chanceOfBlock = 0.0f;
-
-                    for (int oct = 0; oct < interpolators.Length; oct++)
-                    {
-                        chanceOfBlock += interpolators[oct].trilinearInterpolation(blockX, (float)b * blockSize, blockZ) * octaveWeights[oct];
-                    }
-
-                    chanceOfBlock = chanceOfBlock / (sum);
-
-                    float perlinValue = Mathf.PerlinNoise(blockX * pScale, blockZ * pScale);
-                    float perlinValue2 = Mathf.PerlinNoise((blockX + 456456) * pScale2, (blockZ + 12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
-                    float heightFactor = ((float)b / maxNumBlocks) - (perlinValue2 * 0.25f);
-
-                    float combinedCurveValue = (perlinValue * curve.Evaluate(heightFactor)) + ((1.0f - perlinValue) * curve2.Evaluate(heightFactor)); //Mixing two curves based on noise
-
-                    if (chanceOfBlock < combinedCurveValue)
-                    {
-                        if (contBlock)
-                        {
-                            //increment curent block height
-                            numBlocks++;
-                        }
-                        else
-                        {
-                            //start new block
-                            contBlock = true;
-                            blockHeight = b;
-                        }
-                    }
-                    else
-                    {
-                        if (contBlock && numBlocks != 0)
-                        {
-                            //spawn block
-
-                            hObj = (GameObject)Instantiate(hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
-                            hObj.transform.SetParent(holder.transform);
-                            result.hexObjs.Add(hObj);
-							result.blockTypes [i,j,b] = 1;
-
-                            hObj.transform.localScale = new Vector3(1, 1, numBlocks * blockSize);
-                            hObj.transform.localPosition = new Vector3(blockX, blockHeight * blockSize, j * 1.5f + deltaZ);
-                            scaleUV(hObj);
-
-                            contBlock = false;
-                            numBlocks = 0;
-                        }
-                        else
-                        {
-                            //nothing to be done
-                        }
-                    }
-                }
-
-                if (contBlock && numBlocks != 0)
-                {
-                    hObj = (GameObject)Instantiate(hexObj, new Vector3(0, 0, 0), hexObj.transform.rotation);
-                    result.hexObjs.Add(hObj);
-                    hObj.transform.SetParent(holder.transform);
-					result.blockTypes [i,j,maxNumBlocks-1] = 1;
-
-                    hObj.transform.localScale = new Vector3(1, 1, numBlocks * blockSize);
-                    hObj.transform.localPosition = new Vector3(blockX, blockHeight * blockSize, j * 1.5f + deltaZ);
-                    scaleUV(hObj);
-                }
-            }
-        }
-
-    
-        
-
-        chunks.Add(result);
-        temp.Add(holder);
-        return result;
-
-        */
+			
+		return blockValues;
     }
 
     public Chunk instantiateChunk(Vector2 cPos, int size, int maxNumBlocks, short[,,] blockValues) {
@@ -310,12 +172,13 @@ public class Generate : MonoBehaviour {
                         //instantiate block if not air
                         if (previousID != (short)BLOCKID.Air) {
                             GameObject hObj = null;
-                            if(previousID == (short)BLOCKID.Stone)
-                                hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
-                            else if(previousID == (short)BLOCKID.Dirt)
-                                hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
-                            else if (previousID == (short)BLOCKID.Grass)
-                                hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
+							if (previousID == (short)BLOCKID.Stone) {
+								hObj = (GameObject)Instantiate (block_stone, new Vector3 (0, 0, 0), block_stone.transform.rotation);
+							} else if (previousID == (short)BLOCKID.Dirt) {
+								hObj = (GameObject)Instantiate (block_dirt, new Vector3 (0, 0, 0), block_dirt.transform.rotation);
+							} else if (previousID == (short)BLOCKID.Grass) {
+								hObj = (GameObject)Instantiate (block_grass, new Vector3 (0, 0, 0), block_grass.transform.rotation);
+							}
 
                             result.hexObjs.Add(hObj);
                             hObj.transform.SetParent(holder.transform);
@@ -507,7 +370,6 @@ public class Generate : MonoBehaviour {
     {
         loadedChunks = new Dictionary<Vector2, Chunk>();
         
-
         Chunk firstChunk = genInstChunk(findCurrentChunk(source.transform.position), size, maxNumBlocks);
         currentChunk.x = firstChunk.pos.x;
         currentChunk.y = firstChunk.pos.y;
@@ -521,6 +383,7 @@ public class Generate : MonoBehaviour {
 
     public void LateUpdate()
     {
+
         Vector2 cc = findCurrentChunk(source.transform.position);
         int x = (int)cc.x;
         int z = (int)cc.y;
