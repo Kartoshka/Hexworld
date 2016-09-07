@@ -6,6 +6,7 @@ using CielaSpike;
 
 public class Generate : MonoBehaviour {
 
+	private List<Chunk> awaitingInstantiation;
     //Along x axis
     private float xDistanceBlocks = 0.866f * 2f;
     //Along z axis, distance between blocks
@@ -45,8 +46,9 @@ public class Generate : MonoBehaviour {
 
     
 	public bool optimization =false;
-    public short[,,] genChunk(Vector2 cPos, int size, int maxNumBlocks)
+    public /*short[,,]*/Chunk genChunk(Vector2 cPos, int size, int maxNumBlocks)
     {
+		Debug.Log ("GenChunk");
         short[,,] blockValues = new short[size, size, maxNumBlocks];
 
         int chunkX = Mathf.FloorToInt(cPos.x);
@@ -62,12 +64,12 @@ public class Generate : MonoBehaviour {
             sum += f;
         }
 
-        interpolators = new TrilinearInterpolation[octaveDistances.Length];
-
-        for (int d = 0; d < interpolators.Length; d++)
-        {
-            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
-        }
+//        interpolators = new TrilinearInterpolation[octaveDistances.Length];
+//
+//        for (int d = 0; d < interpolators.Length; d++)
+//        {
+//            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
+//        }
 
         //First pass for main stone generation
         for (int i = 0; i < size; i++) {
@@ -127,10 +129,28 @@ public class Generate : MonoBehaviour {
                 }
             }
         }
-			
-		return blockValues;
-    }
+		Chunk result = new Chunk ();
+		result.blockTypes = blockValues;
+		result.size = size;
+		result.pos = cPos;
 
+		return result;//blockValues;
+    }
+	public IEnumerator TraverseList(){
+		if (awaitingInstantiation == null) {
+			yield return null;
+		}
+		else {
+			Chunk[] listToParse = awaitingInstantiation.ToArray ();
+			//awaitingInstantiation.Clear ();
+			foreach (Chunk c in listToParse) {
+				loadedChunks.Add (c.pos,instantiateChunk (c.pos, c.size, maxNumBlocks, c.blockTypes));
+				awaitingInstantiation.Remove (c);
+			}
+		}
+		awaitingInstantiation.Clear ();
+		yield return null;
+	}
     public Chunk instantiateChunk(Vector2 cPos, int size, int maxNumBlocks, short[,,] blockValues) {
         GameObject holder = new GameObject("Holder of chunk of size " + size);
         if (chunks == null)
@@ -205,9 +225,11 @@ public class Generate : MonoBehaviour {
     }
 
     //Generate and immediately instantiate a chunk
-    public Chunk genInstChunk(Vector2 cPos, int size, int maxNumBlocks) {
-        short[,,] blockValues = genChunk(cPos, size, maxNumBlocks);
-        return instantiateChunk(cPos, size, maxNumBlocks, blockValues);
+	public IEnumerator getChunkAtPos(Vector2 cPos, int size, int maxNumBlocks) {
+		Chunk blockValues = genChunk(cPos, size, maxNumBlocks);
+		awaitingInstantiation.Add (blockValues);
+		yield return null;//
+		//return blockValues;//instantiateChunk(cPos, size, maxNumBlocks, blockValues.blockTypes);
     }
 
     //Scale the UV coordinates of a block's mesh
@@ -224,17 +246,11 @@ public class Generate : MonoBehaviour {
 
         for (int i = 0; i < uvs.Length; i++)
         {
-            //uvs[i] = mesh.uv[i];
-            //Debug.Log(mesh.uv[i]);
             uvs[i][0] = mesh.uv[i][0];
-
 
             if (mesh.uv[i][1] == 0.5)
             {
-                //Debug.Log("Change");
                 uvs[i][1] = 0.5f * obj.transform.localScale[2];
-                //uvs[i][1] = mesh.uv[i][1] * 50;
-                //uvs[i][1] = 25f;
             }
             else {
                 uvs[i][1] = mesh.uv[i][1];
@@ -269,7 +285,8 @@ public class Generate : MonoBehaviour {
             }
         }
         chunks = new List<Chunk>();
-        //interpolator = new TrilinearInterpolation(interpolationDistance);
+
+		awaitingInstantiation.Clear ();
     }
 
     [System.Serializable]
@@ -283,7 +300,7 @@ public class Generate : MonoBehaviour {
 
     private class TrilinearInterpolation {
         [SerializeField]
-        private Dictionary<Vector3, float> interpolators;
+		private ConcurrentDictionary<Vector3, float> interpolators;
         [SerializeField]
         private OpenSimplexNoise noise;
         [SerializeField]
@@ -296,31 +313,33 @@ public class Generate : MonoBehaviour {
         public TrilinearInterpolation(long seed, int distanceInterpolation) {
             noise = new OpenSimplexNoise(seed);
             this.interpolationDistance = distanceInterpolation;
-            interpolators = new Dictionary<Vector3, float>();
+			interpolators = new ConcurrentDictionary<Vector3, float>();
         }
 
 
-        private float getPerlinNoise(int x, int y, int z) {
+        private float getSimplexNoise(int x, int y, int z) {
             if (interpolators == null) {
-                interpolators = new Dictionary<Vector3, float>();
+				interpolators = new ConcurrentDictionary<Vector3, float>();
             }
             if (noise == null) {
                 noise = new OpenSimplexNoise();
             }
-            float result;
-            if (!interpolators.TryGetValue(new Vector3(x, y, z), out result)) {
-                result = (float)noise.Evaluate(x, y, z);
-                interpolators.Add(new Vector3(x, y, z), result);
-            }
+//            float result;
+//            if (!interpolators.TryGetValue(new Vector3(x, y, z), out result)) {
+//                result = (float)noise.Evaluate(x, y, z);
+//				if(!interpolators.ContainsKey(new Vector3(x,y,z))){
+//					interpolators.Add(new Vector3(x, y, z), result);
+//				}
+//            }
 
-            return result;
+			return (float)noise.Evaluate(x, y, z);
         }
 
         //http://paulbourke.net/miscellaneous/interpolation/
         public float trilinearInterpolation(float x, float y, float z) {
 
             if (x % interpolationDistance == 0 && y % interpolationDistance == 0 && z % interpolationDistance == 0) {
-                return getPerlinNoise((int)x, (int)y, (int)z);
+                return getSimplexNoise((int)x, (int)y, (int)z);
             }
 
             int minX = Mathf.FloorToInt((Mathf.Floor(x) / (float)interpolationDistance)) * interpolationDistance;
@@ -331,14 +350,14 @@ public class Generate : MonoBehaviour {
             int maxY = minY + interpolationDistance;
             int maxZ = minZ + interpolationDistance;
 
-            float V000 = getPerlinNoise(minX, minY, minZ);
-            float V100 = getPerlinNoise(maxX, minY, minZ);
-            float V010 = getPerlinNoise(minX, maxY, minZ);
-            float V001 = getPerlinNoise(minX, minY, maxZ);
-            float V101 = getPerlinNoise(maxX, minY, maxZ);
-            float V011 = getPerlinNoise(minX, maxY, maxZ);
-            float V110 = getPerlinNoise(maxX, maxY, minZ);
-            float V111 = getPerlinNoise(maxX, maxY, maxZ);
+            float V000 = getSimplexNoise(minX, minY, minZ);
+            float V100 = getSimplexNoise(maxX, minY, minZ);
+            float V010 = getSimplexNoise(minX, maxY, minZ);
+            float V001 = getSimplexNoise(minX, minY, maxZ);
+            float V101 = getSimplexNoise(maxX, minY, maxZ);
+            float V011 = getSimplexNoise(minX, maxY, maxZ);
+            float V110 = getSimplexNoise(maxX, maxY, minZ);
+            float V111 = getSimplexNoise(maxX, maxY, maxZ);
 
             float localX = (x - minX) / interpolationDistance;
             float localY = (y - minY) / interpolationDistance;
@@ -369,15 +388,26 @@ public class Generate : MonoBehaviour {
     public void Start()
     {
         loadedChunks = new Dictionary<Vector2, Chunk>();
-        
-        Chunk firstChunk = genInstChunk(findCurrentChunk(source.transform.position), size, maxNumBlocks);
-        currentChunk.x = firstChunk.pos.x;
-        currentChunk.y = firstChunk.pos.y;
+		awaitingInstantiation = new List<Chunk> ();
 
-        loadedChunks.Add(currentChunk, firstChunk);
+		interpolators = new TrilinearInterpolation[octaveDistances.Length];
+
+		for (int d = 0; d < interpolators.Length; d++)
+		{
+			interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
+		}
+
+		StartCoroutine(getChunkAtPos(findCurrentChunk(source.transform.position), size, maxNumBlocks));
+		StartCoroutine(TraverseList ());
+		verifySurroundings();
+		StartCoroutine(TraverseList ());
+
+		currentChunk.x = findCurrentChunk (source.transform.position).x;
+		currentChunk.y = findCurrentChunk (source.transform.position).y;
+		Debug.Log (awaitingInstantiation.Count);
+       // loadedChunks.Add(currentChunk, firstChunk);
         
         
-		StartCoroutine(verifySurroundings());
 
     }
 
@@ -393,8 +423,9 @@ public class Generate : MonoBehaviour {
             currentChunk.x = x;
             currentChunk.y = z;
 
-			StartCoroutine(verifySurroundings());
+			verifySurroundings();
         }
+		StartCoroutine(TraverseList ());
     }
 
 
@@ -402,12 +433,11 @@ public class Generate : MonoBehaviour {
     public Vector2 findCurrentChunk(Vector3 sourcePos) {
         int x = Mathf.FloorToInt(source.transform.position.x / ((float)size * xDistanceBlocks));
         int z = Mathf.FloorToInt(source.transform.position.z / ((float)size * zDistanceBlocks));
-        //Debug.Log("Source Position: ( " + source.transform.position.x + " , " + source.transform.position.z + " )");
-        //Debug.Log("Current Chunk: ( " + x + " , " + z + " )");
+
         return new Vector2(x, z);
     }
 
-	private IEnumerator verifySurroundings() {
+	private void verifySurroundings() {
         int startX = (int)this.currentChunk.x - (radius);
         int startZ = (int)this.currentChunk.y - (radius);
 
@@ -418,14 +448,13 @@ public class Generate : MonoBehaviour {
             for (int k = 0; k < squareSize; k++)
             {
                 if (!loadedChunks.ContainsKey(new Vector2(startX + i, startZ + k))) {
-                    //loadedChunks.Add((new Vector2(startX + i, startZ + k)), getChunk(new Vector3((startX + i) * xDistanceBlocks, 0, (startZ + k) * zDistanceBlocks), new Vector2(0, 0), size, maxNumBlocks));
-                    Chunk newC = genInstChunk(new Vector2(startX + i, startZ + k), size, maxNumBlocks);
-                    loadedChunks.Add(new Vector2(startX + i, startZ + k), newC);
-                    //Debug.Log((new Vector2(startX + i, startZ + k)));
+					this.StartCoroutineAsync (getChunkAtPos (new Vector2 (startX + i, startZ + k), size, maxNumBlocks));
+                    //loadedChunks.Add(new Vector2(startX + i, startZ + k), newC);
+
                 }
             }
         }
-		yield return null;
+		//yield return null;
     }
     #endregion
 }
