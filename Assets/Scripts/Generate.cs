@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using NoiseTest;
 using CielaSpike;
 
+
 public class Generate : MonoBehaviour {
 
     //Along x axis
