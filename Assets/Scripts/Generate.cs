@@ -65,12 +65,12 @@ public class Generate : MonoBehaviour {
             sum += f;
         }
 
-//        interpolators = new TrilinearInterpolation[octaveDistances.Length];
-//
-//        for (int d = 0; d < interpolators.Length; d++)
-//        {
-//            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
-//        }
+        interpolators = new TrilinearInterpolation[octaveDistances.Length];
+
+        for (int d = 0; d < interpolators.Length; d++)
+        {
+            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
+        }
 
         //First pass for main stone generation
         for (int i = 0; i < size; i++) {
@@ -90,11 +90,11 @@ public class Generate : MonoBehaviour {
 					float perlinValue2 = Mathf.PerlinNoise((blockX + 456456) * pScale2, (blockZ + 12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
 					float heightFactor = ((float)k / maxNumBlocks) - (perlinValue2 * 0.25f); //Not sure what this 0.25f is, may or may not be min block height, should be looked into
 					float combinedCurveValue = (perlinValue * curve.Evaluate(heightFactor)) + ((1.0f - perlinValue) * curve2.Evaluate(heightFactor)); //Mixing two curves based on noise
-
+                    /*
 					if (combinedCurveValue <= 0) {
 						blockValues[i, j, k] = (short)BLOCKID.Air;
 						continue;
-					}
+					}*/
 
                     for (int oct = 0; oct < interpolators.Length; oct++)
                     {
@@ -106,6 +106,7 @@ public class Generate : MonoBehaviour {
                     
 
                     if (chanceOfBlock < combinedCurveValue)
+                    //if(k < maxNumBlocks/2)
                     {
 
 						if (prev == (short)BLOCKID.Air){
@@ -130,6 +131,7 @@ public class Generate : MonoBehaviour {
                 }
             }
         }
+
 		Chunk result = new Chunk ();
 		result.blockTypes = blockValues;
 		result.size = size;
@@ -137,6 +139,8 @@ public class Generate : MonoBehaviour {
 
 		return result;//blockValues;
     }
+
+
 	public IEnumerator TraverseList(){
 		if (awaitingInstantiation == null) {
 			yield return null;
