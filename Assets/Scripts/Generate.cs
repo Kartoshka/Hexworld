@@ -150,7 +150,9 @@ public class Generate : MonoBehaviour {
             while (awaitingInstantiation.Count > 0)
             {
                 Chunk c = awaitingInstantiation.Dequeue();
-                loadedChunks.Add(c.pos, instantiateChunk(c.pos, c.size, maxNumBlocks, c.blockTypes));
+                if (!loadedChunks.ContainsKey(c.pos)) { 
+                    loadedChunks.Add(c.pos, instantiateChunk(c.pos, c.size, maxNumBlocks, c.blockTypes));
+                 }
             }
 			//Chunk[] listToParse = awaitingInstantiation.ToArray ();
 			//awaitingInstantiation.Clear ();
