@@ -26,6 +26,12 @@ public class Generate : MonoBehaviour {
     //public ThreadsafeCurve curve;
     //public ThreadsafeCurve curve2;
 
+    //For future generation implementation
+    public AnimationCurve densityCurve_plains;
+    public AnimationCurve densityCurve_mountains;
+    public AnimationCurve densityCurve_caves;
+    public AnimationCurve densityMixFactor;
+
     public Vector2 chunkPosition;
     public int size;
     public int maxNumBlocks;
