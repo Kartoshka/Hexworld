@@ -7,7 +7,7 @@ using CielaSpike;
 
 public class Generate : MonoBehaviour {
 
-	private List<Chunk> awaitingInstantiation;
+	private Queue<Chunk> awaitingInstantiation;
     //Along x axis
     private float xDistanceBlocks = 0.866f * 2f;
     //Along z axis, distance between blocks
@@ -20,8 +20,8 @@ public class Generate : MonoBehaviour {
     public GameObject block_dirt;
     public GameObject block_grass;
 
-    public AnimationCurve curve;
-    public AnimationCurve curve2;
+    public ThreadsafeCurve curve;
+    public ThreadsafeCurve curve2;
 
     public Vector2 chunkPosition;
     public int size;
@@ -49,6 +49,7 @@ public class Generate : MonoBehaviour {
 	public bool optimization =false;
     public /*short[,,]*/Chunk genChunk(Vector2 cPos, int size, int maxNumBlocks)
     {
+        
 		Debug.Log ("GenChunk");
         short[,,] blockValues = new short[size, size, maxNumBlocks];
 
@@ -65,12 +66,12 @@ public class Generate : MonoBehaviour {
             sum += f;
         }
 
-        interpolators = new TrilinearInterpolation[octaveDistances.Length];
+        //interpolators = new TrilinearInterpolation[octaveDistances.Length];
 
-        for (int d = 0; d < interpolators.Length; d++)
-        {
-            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
-        }
+        //for (int d = 0; d < interpolators.Length; d++)
+        //{
+        //    interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
+        //}
 
         //First pass for main stone generation
         for (int i = 0; i < size; i++) {
@@ -146,12 +147,17 @@ public class Generate : MonoBehaviour {
 			yield return null;
 		}
 		else {
-			Chunk[] listToParse = awaitingInstantiation.ToArray ();
+            while (awaitingInstantiation.Count > 0)
+            {
+                Chunk c = awaitingInstantiation.Dequeue();
+                loadedChunks.Add(c.pos, instantiateChunk(c.pos, c.size, maxNumBlocks, c.blockTypes));
+            }
+			//Chunk[] listToParse = awaitingInstantiation.ToArray ();
 			//awaitingInstantiation.Clear ();
-			foreach (Chunk c in listToParse) {
-				loadedChunks.Add (c.pos,instantiateChunk (c.pos, c.size, maxNumBlocks, c.blockTypes));
-				awaitingInstantiation.Remove (c);
-			}
+			//foreach (Chunk c in listToParse) {
+			//	loadedChunks.Add (c.pos,instantiateChunk (c.pos, c.size, maxNumBlocks, c.blockTypes));
+			//	awaitingInstantiation.Remove (c);
+			//}
 		}
 		awaitingInstantiation.Clear ();
 		yield return null;
@@ -232,7 +238,7 @@ public class Generate : MonoBehaviour {
     //Generate and immediately instantiate a chunk
 	public IEnumerator getChunkAtPos(Vector2 cPos, int size, int maxNumBlocks) {
 		Chunk blockValues = genChunk(cPos, size, maxNumBlocks);
-		awaitingInstantiation.Add (blockValues);
+		awaitingInstantiation.Enqueue (blockValues);
 		yield return null;//
 		//return blockValues;//instantiateChunk(cPos, size, maxNumBlocks, blockValues.blockTypes);
     }
@@ -393,7 +399,7 @@ public class Generate : MonoBehaviour {
     public void Start()
     {
         loadedChunks = new Dictionary<Vector2, Chunk>();
-		awaitingInstantiation = new List<Chunk> ();
+		awaitingInstantiation = new Queue<Chunk> ();
 
 		interpolators = new TrilinearInterpolation[octaveDistances.Length];
 

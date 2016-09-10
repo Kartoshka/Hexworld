@@ -79,26 +79,27 @@ NavMeshSettings:
   m_ObjectHideFlags: 0
   m_BuildSettings:
     serializedVersion: 2
+    agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
     agentSlope: 45
     agentClimb: 0.4
     ledgeDropHeight: 0
     maxJumpAcrossDistance: 0
-    accuratePlacement: 0
     minRegionArea: 2
-    cellSize: 0.16666667
     manualCellSize: 0
+    cellSize: 0.16666667
+    accuratePlacement: 0
   m_NavMeshData: {fileID: 0}
 --- !u!1 &575319493
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 575319495}
-  - 114: {fileID: 575319494}
+  - component: {fileID: 575319495}
+  - component: {fileID: 575319494}
   m_Layer: 0
   m_Name: GenerateEmpty
   m_TagString: Untagged
@@ -124,67 +125,79 @@ MonoBehaviour:
   block_grass: {fileID: 1000012266192404, guid: 0e41b6d9b95fb4346a66e9d3d8b3dfa2,
     type: 2}
   curve:
-    serializedVersion: 2
-    m_Curve:
-    - time: 0
-      value: 0.9967654
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 0.08719333
-      value: 0.31079245
-      inSlope: -2.6400387
-      outSlope: -2.6400387
-      tangentMode: 0
-    - time: 0.56813
-      value: 0.028112516
-      inSlope: -0.61154366
-      outSlope: -0.61154366
-      tangentMode: 0
-    - time: 0.7045068
-      value: -0.9979962
-      inSlope: -0.08594124
-      outSlope: -0.08594124
-      tangentMode: 0
-    - time: 0.9974662
-      value: -1.00008
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 0
+    _curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0.9967654
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.08719333
+        value: 0.31079245
+        inSlope: -2.6400387
+        outSlope: -2.6400387
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.56813
+        value: 0.028112516
+        inSlope: -0.61154366
+        outSlope: -0.61154366
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.7045068
+        value: -0.9979962
+        inSlope: -0.08594124
+        outSlope: -0.08594124
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.9974662
+        value: -1.00008
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
   curve2:
-    serializedVersion: 2
-    m_Curve:
-    - time: 0
-      value: 0.9967654
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 0.04412093
-      value: 0.15897433
-      inSlope: -2.6400387
-      outSlope: -2.6400387
-      tangentMode: 0
-    - time: 0.40490827
-      value: 0.020109126
-      inSlope: -0.61154366
-      outSlope: -0.61154366
-      tangentMode: 0
-    - time: 0.63876474
-      value: -0.99399453
-      inSlope: -0.08594124
-      outSlope: -0.08594124
-      tangentMode: 0
-    - time: 0.9974662
-      value: -1.00008
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 0
+    _curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0.9967654
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.04412093
+        value: 0.15897433
+        inSlope: -2.6400387
+        outSlope: -2.6400387
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.40490827
+        value: 0.020109126
+        inSlope: -0.61154366
+        outSlope: -0.61154366
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.63876474
+        value: -0.99399453
+        inSlope: -0.08594124
+        outSlope: -0.08594124
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.9974662
+        value: -1.00008
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
   chunkPosition: {x: 0, y: 0}
   size: 16
   maxNumBlocks: 512
@@ -211,19 +224,19 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &620707949
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 620707950}
-  - 108: {fileID: 620707951}
+  - component: {fileID: 620707950}
+  - component: {fileID: 620707951}
   m_Layer: 0
   m_Name: Directional light
   m_TagString: Untagged
@@ -240,10 +253,10 @@ Transform:
   m_LocalRotation: {x: 0.021189554, y: 0.78021586, z: 0.49498287, w: -0.38184565}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: -127.948, y: 69.2, z: 145.879}
   m_Children: []
   m_Father: {fileID: 637373412}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -127.948, y: 69.2, z: 145.879}
 --- !u!108 &620707951
 Light:
   m_ObjectHideFlags: 0
@@ -283,10 +296,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 637373412}
-  - 108: {fileID: 637373413}
+  - component: {fileID: 637373412}
+  - component: {fileID: 637373413}
   m_Layer: 0
   m_Name: Lights
   m_TagString: Untagged
@@ -303,11 +316,11 @@ Transform:
   m_LocalRotation: {x: 0.8950084, y: -0, z: -0, w: 0.4460493}
   m_LocalPosition: {x: -6.1, y: 105.2, z: 54.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 127.028, y: -0.000015258789, z: -0.000015258789}
   m_Children:
   - {fileID: 620707950}
   m_Father: {fileID: 0}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 127.028, y: -0.000015258789, z: -0.000015258789}
 --- !u!108 &637373413
 Light:
   m_ObjectHideFlags: 0
@@ -351,12 +364,12 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 1106348836}
-  - 33: {fileID: 1106348835}
-  - 64: {fileID: 1106348834}
-  - 23: {fileID: 1106348833}
+  - component: {fileID: 1106348836}
+  - component: {fileID: 1106348835}
+  - component: {fileID: 1106348834}
+  - component: {fileID: 1106348833}
   m_Layer: 0
   m_Name: Plane (1)
   m_TagString: Untagged
@@ -378,7 +391,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 27a8cd14a42240f449c74becc69e0bf7, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
@@ -404,6 +419,8 @@ MeshCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!33 &1106348835
 MeshFilter:
@@ -421,10 +438,10 @@ Transform:
   m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
   m_LocalPosition: {x: 1247, y: 34.02441, z: 176}
   m_LocalScale: {x: 40.194664, y: 40.19464, z: 40.19464}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 90}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 90}
 --- !u!1001 &1153822875
 Prefab:
   m_ObjectHideFlags: 0
@@ -512,10 +529,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 1737253186}
-  - 108: {fileID: 1737253187}
+  - component: {fileID: 1737253186}
+  - component: {fileID: 1737253187}
   m_Layer: 0
   m_Name: Spotlight
   m_TagString: Untagged
@@ -532,10 +549,10 @@ Transform:
   m_LocalRotation: {x: 0.114727326, y: -0, z: -0, w: 0.99339706}
   m_LocalPosition: {x: 0, y: -0.144, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 13.120001, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 727429530}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 13.120001, y: 0, z: 0}
 --- !u!108 &1737253187
 Light:
   m_ObjectHideFlags: 0
@@ -575,12 +592,12 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 2097000858}
-  - 33: {fileID: 2097000857}
-  - 64: {fileID: 2097000856}
-  - 23: {fileID: 2097000855}
+  - component: {fileID: 2097000858}
+  - component: {fileID: 2097000857}
+  - component: {fileID: 2097000856}
+  - component: {fileID: 2097000855}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -602,7 +619,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 27a8cd14a42240f449c74becc69e0bf7, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
@@ -628,6 +647,8 @@ MeshCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!33 &2097000857
 MeshFilter:
@@ -645,7 +666,7 @@ Transform:
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 1052.3738, y: 34.02441, z: 372.5}
   m_LocalScale: {x: 40.194664, y: 40.19464, z: 40.19464}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
