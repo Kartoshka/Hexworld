@@ -20,8 +20,11 @@ public class Generate : MonoBehaviour {
     public GameObject block_dirt;
     public GameObject block_grass;
 
-    public ThreadsafeCurve curve;
-    public ThreadsafeCurve curve2;
+    public AnimationCurve curve;
+    public AnimationCurve curve2;
+
+    //public ThreadsafeCurve curve;
+    //public ThreadsafeCurve curve2;
 
     public Vector2 chunkPosition;
     public int size;
@@ -66,12 +69,15 @@ public class Generate : MonoBehaviour {
             sum += f;
         }
 
-        //interpolators = new TrilinearInterpolation[octaveDistances.Length];
+        /*
+        interpolators = new TrilinearInterpolation[octaveDistances.Length];
 
-        //for (int d = 0; d < interpolators.Length; d++)
-        //{
-        //    interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
-        //}
+        for (int d = 0; d < interpolators.Length; d++)
+        {
+            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
+        }
+        */
+        
 
         //First pass for main stone generation
         for (int i = 0; i < size; i++) {
@@ -87,10 +93,14 @@ public class Generate : MonoBehaviour {
 
                     float chanceOfBlock = 0.0f;
 
-					float perlinValue = Mathf.PerlinNoise(blockX * pScale, blockZ * pScale);
+                    AnimationCurve newCurve1 = new AnimationCurve(curve.keys);
+                    AnimationCurve newCurve2 = new AnimationCurve(curve2.keys);
+
+
+                    float perlinValue = Mathf.PerlinNoise(blockX * pScale, blockZ * pScale);
 					float perlinValue2 = Mathf.PerlinNoise((blockX + 456456) * pScale2, (blockZ + 12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
 					float heightFactor = ((float)k / maxNumBlocks) - (perlinValue2 * 0.25f); //Not sure what this 0.25f is, may or may not be min block height, should be looked into
-					float combinedCurveValue = (perlinValue * curve.Evaluate(heightFactor)) + ((1.0f - perlinValue) * curve2.Evaluate(heightFactor)); //Mixing two curves based on noise
+					float combinedCurveValue = (perlinValue * newCurve1.Evaluate(heightFactor)) + ((1.0f - perlinValue) * newCurve2.Evaluate(heightFactor)); //Mixing two curves based on noise
                     /*
 					if (combinedCurveValue <= 0) {
 						blockValues[i, j, k] = (short)BLOCKID.Air;
