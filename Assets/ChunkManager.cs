@@ -81,11 +81,7 @@ public class ChunkManager : MonoBehaviour {
 
         if(moved)
         {
-<<<<<<< HEAD
-           currentChunkPos = pos;
-=======
             currentChunkPos = pos;
->>>>>>> f05c58498f2e6454df62902329d341b9c48a5c18
         }
 
         foreach (AbChunkModifier cMod in chunkModifiers)
