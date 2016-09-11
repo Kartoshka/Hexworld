@@ -43,7 +43,6 @@ public class ChunkManager : MonoBehaviour {
 
 
     [SerializeField]
-    [HideInInspector]
     private List<Chunk> chunks;
 
     Dictionary<Vector2, Chunk> loadedChunks;
@@ -71,16 +70,22 @@ public class ChunkManager : MonoBehaviour {
         {
             cMod.OnChunkManagerStart(this);
         }
+
+       
     }
 	
 	// Update is called once per frame
 	void LateUpdate () {
         Vector2 pos = findCurrentChunk();
-        bool moved = currentChunkPos != pos;
+        bool moved = !(currentChunkPos.Equals(pos));
 
         if(moved)
         {
+<<<<<<< HEAD
            currentChunkPos = pos;
+=======
+            currentChunkPos = pos;
+>>>>>>> f05c58498f2e6454df62902329d341b9c48a5c18
         }
 
         foreach (AbChunkModifier cMod in chunkModifiers)
@@ -178,7 +183,7 @@ public class ChunkManager : MonoBehaviour {
         result.size = size;
         result.pos = cPos;
 
-        loadedChunks.Add(cPos, result);
+        //loadedChunks.Add(cPos, result);
 
         return result;
     }
@@ -267,7 +272,7 @@ public class ChunkManager : MonoBehaviour {
         }
         
         chunks.Add(result);
-                
+        loadedChunks.Add(result.pos, result);
         return result;
     }
 

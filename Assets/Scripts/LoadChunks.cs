@@ -17,17 +17,20 @@ public class LoadChunks : AbChunkModifier
         cManager.instantiateChunk(c.pos, cManager.size, cManager.maxNumBlocks, c.blockTypes);
 
         this.verifySurroundings(cManager);
-        this.TraverseList(cManager);
+        StartCoroutine(TraverseList(cManager));
+
     }
     public override void OnMoveChunks(ChunkManager cManager)
     {
+        Debug.Log("moved chunks");
         this.verifySurroundings(cManager);
     }
 
     public override void OnChunkManagerUpdate(ChunkManager cManager)
     {
-        if (awaitingInstantiation.Count > 0 && traversal == null)
+        if (awaitingInstantiation.Count > 0)
         {
+            Debug.Log("Traverse list");
             traversal = StartCoroutine(TraverseList(cManager));
         }
     }
@@ -65,6 +68,7 @@ public class LoadChunks : AbChunkModifier
             {
                 if (!cManager.chunkIsLoaded(new Vector2(startX + i, startZ + k)))
                 {
+                    Debug.Log("Gen chunk " + new Vector2(startX + i, startZ + k));
                     this.StartCoroutineAsync(chunkGenThread(cManager, new Vector2(startX + i, startZ + k)));
                 }
             }
