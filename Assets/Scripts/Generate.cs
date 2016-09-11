@@ -23,9 +23,6 @@ public class Generate : MonoBehaviour {
     public AnimationCurve curve;
     public AnimationCurve curve2;
 
-    //public ThreadsafeCurve curve;
-    //public ThreadsafeCurve curve2;
-
     //For future generation implementation
     public AnimationCurve densityCurve_plains;
     public AnimationCurve densityCurve_mountains;
@@ -53,7 +50,6 @@ public class Generate : MonoBehaviour {
     List<GameObject> temp;
     [SerializeField]
     private List<Chunk> chunks;
-
     
 	public bool optimization =false;
     public /*short[,,]*/Chunk genChunk(Vector2 cPos, int size, int maxNumBlocks)
@@ -74,16 +70,6 @@ public class Generate : MonoBehaviour {
         {
             sum += f;
         }
-
-        /*
-        interpolators = new TrilinearInterpolation[octaveDistances.Length];
-
-        for (int d = 0; d < interpolators.Length; d++)
-        {
-            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
-        }
-        */
-        
 
         //First pass for main stone generation
         for (int i = 0; i < size; i++) {
@@ -170,12 +156,6 @@ public class Generate : MonoBehaviour {
                     loadedChunks.Add(c.pos, instantiateChunk(c.pos, c.size, maxNumBlocks, c.blockTypes));
                  }
             }
-			//Chunk[] listToParse = awaitingInstantiation.ToArray ();
-			//awaitingInstantiation.Clear ();
-			//foreach (Chunk c in listToParse) {
-			//	loadedChunks.Add (c.pos,instantiateChunk (c.pos, c.size, maxNumBlocks, c.blockTypes));
-			//	awaitingInstantiation.Remove (c);
-			//}
 		}
 		awaitingInstantiation.Clear ();
 		yield return null;
@@ -264,7 +244,6 @@ public class Generate : MonoBehaviour {
     //Scale the UV coordinates of a block's mesh
     public void scaleUV(GameObject obj)
     {
-
         obj.GetComponent<MeshFilter>().sharedMesh = Instantiate(obj.GetComponent<MeshFilter>().sharedMesh);
         //obj.GetComponent<MeshFilter>().sharedMesh = (Mesh)Instantiate(obj.GetComponent<MeshFilter>().sharedMesh);
         Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
@@ -353,14 +332,6 @@ public class Generate : MonoBehaviour {
             if (noise == null) {
                 noise = new OpenSimplexNoise();
             }
-//            float result;
-//            if (!interpolators.TryGetValue(new Vector3(x, y, z), out result)) {
-//                result = (float)noise.Evaluate(x, y, z);
-//				if(!interpolators.ContainsKey(new Vector3(x,y,z))){
-//					interpolators.Add(new Vector3(x, y, z), result);
-//				}
-//            }
-
 			return (float)noise.Evaluate(x, y, z);
         }
 
@@ -435,9 +406,6 @@ public class Generate : MonoBehaviour {
 		currentChunk.y = findCurrentChunk (source.transform.position).y;
 		Debug.Log (awaitingInstantiation.Count);
        // loadedChunks.Add(currentChunk, firstChunk);
-        
-        
-
     }
 
     public void LateUpdate()
