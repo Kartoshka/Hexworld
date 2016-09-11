@@ -80,7 +80,7 @@ public class ChunkManager : MonoBehaviour {
 
         if(moved)
         {
-           pos = currentChunkPos;
+           currentChunkPos = pos;
         }
 
         foreach (AbChunkModifier cMod in chunkModifiers)
