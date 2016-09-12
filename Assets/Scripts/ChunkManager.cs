@@ -41,6 +41,10 @@ public class ChunkManager : MonoBehaviour {
     public float pScale = 0.02f;
     public float pScale2 = 0.008f;
 
+    public float pScale_octaves = 0.01f;
+
+    //private float pOff = 170282300000000000000000000000000000000f;
+    private float pOff = 100000f;
 
     [SerializeField]
     private List<Chunk> chunks;
@@ -105,11 +109,13 @@ public class ChunkManager : MonoBehaviour {
         float deltaX = (float)chunkX * (size * xDistanceBlocks);
         float deltaZ = (float)chunkZ * (size * zDistanceBlocks);
 
+        /*
         float sum = 0;
         foreach (float f in octaveWeights)
         {
             sum += f;
         }
+        */
 
         //First pass for main stone generation
         for (int i = 0; i < size; i++)
@@ -135,15 +141,22 @@ public class ChunkManager : MonoBehaviour {
                     float heightFactor = ((float)k / maxNumBlocks) - (perlinValue2 * 0.25f); //Not sure what this 0.25f is, may or may not be min block height, should be looked into
                     float combinedCurveValue = (perlinValue * newCurve1.Evaluate(heightFactor)) + ((1.0f - perlinValue) * newCurve2.Evaluate(heightFactor)); //Mixing two curves based on noise
 
+
+
+                    float weightSum = 0;
+
+
                     for (int oct = 0; oct < interpolators.Length; oct++)
                     {
-                        chanceOfBlock += interpolators[oct].trilinearInterpolation(blockX, (float)k * blockSize, blockZ) * octaveWeights[oct];
+                        float newWeight = octaveWeights[oct]*0.5f + octaveWeights[oct]*Mathf.PerlinNoise(blockX*pScale_octaves + (float)octaveSeeds[oct] + pOff, blockZ*pScale_octaves + (float)octaveSeeds[oct] + pOff);
+                        chanceOfBlock += interpolators[oct].trilinearInterpolation(blockX, (float)k * blockSize, blockZ) * newWeight;
+                        weightSum += newWeight;
                     }
 
-                    chanceOfBlock = chanceOfBlock / (sum);
+                    chanceOfBlock = chanceOfBlock / weightSum;
 
 
-
+                    //if(k < (maxNumBlocks*0.3f)*Mathf.PerlinNoise(blockX*pScale + pOff, blockZ*pScale + pOff))
                     if (chanceOfBlock < combinedCurveValue)
                     {
 
