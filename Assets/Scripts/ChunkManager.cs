@@ -42,6 +42,10 @@ public class ChunkManager : MonoBehaviour {
     public float pScale2 = 0.008f;
 
     public float pScale_octaves = 0.01f;
+    public float pScale_height = 0.008f;
+    public float pScale_mix = 0.0075f;
+    public float pOff_height = 6969f;
+    public float pOff_mix = 1337f;
 
     //private float pOff = 170282300000000000000000000000000000000f;
     private float pOff = 100000f;
@@ -131,8 +135,10 @@ public class ChunkManager : MonoBehaviour {
 
                 for (int k = maxNumBlocks - 1; k >= 0; k--)
                 {
-                    float chanceOfBlock = 0.0f;
 
+
+
+                    /*
                     AnimationCurve newCurve1 = new AnimationCurve(curve.keys);
                     AnimationCurve newCurve2 = new AnimationCurve(curve2.keys);
 
@@ -140,11 +146,29 @@ public class ChunkManager : MonoBehaviour {
                     float perlinValue2 = Mathf.PerlinNoise((blockX + 456456) * pScale2, (blockZ + 12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
                     float heightFactor = ((float)k / maxNumBlocks) - (perlinValue2 * 0.25f); //Not sure what this 0.25f is, may or may not be min block height, should be looked into
                     float combinedCurveValue = (perlinValue * newCurve1.Evaluate(heightFactor)) + ((1.0f - perlinValue) * newCurve2.Evaluate(heightFactor)); //Mixing two curves based on noise
+                    */
+
+                    float heightFactor = (float)k / (float)maxNumBlocks;
+
+                    AnimationCurve densityMixFactor_copy = new AnimationCurve(densityMixFactor.keys);
+                    AnimationCurve densityCurve_mountains_copy = new AnimationCurve(densityCurve_mountains.keys);
+                    AnimationCurve densityCurve_plains_copy = new AnimationCurve(densityCurve_plains.keys);
+                    AnimationCurve densityCurve_caves_copy = new AnimationCurve(densityCurve_caves.keys);
+
+                    float mixValue = densityMixFactor_copy.Evaluate(Mathf.PerlinNoise(blockX*pScale_mix + pOff_mix + pOff, blockZ*pScale_mix + pOff_mix + pOff));
+                    float heightOffset = 0.3f*Mathf.PerlinNoise(blockX * pScale_height + pOff_height + pOff, blockZ * pScale_height + pOff_height + pOff);
+
+                    float mountainValue = densityCurve_mountains_copy.Evaluate(heightFactor - heightOffset);
+                    float plainsValue = densityCurve_plains_copy.Evaluate(heightFactor - heightOffset);
+                    float cavesValue = densityCurve_caves_copy.Evaluate(heightFactor);
+
+                    float biomeCombineValue = ((1-mixValue) * mountainValue) + ((mixValue) * plainsValue);
+
+                    //float caveCombineValue = biomeCombineValue + (cavesValue - 1);
 
 
-
+                    float chanceOfBlock = 0.0f;
                     float weightSum = 0;
-
 
                     for (int oct = 0; oct < interpolators.Length; oct++)
                     {
@@ -154,10 +178,10 @@ public class ChunkManager : MonoBehaviour {
                     }
 
                     chanceOfBlock = chanceOfBlock / weightSum;
+                    
 
-
-                    //if(k < (maxNumBlocks*0.3f)*Mathf.PerlinNoise(blockX*pScale + pOff, blockZ*pScale + pOff))
-                    if (chanceOfBlock < combinedCurveValue)
+                    //if(k < heightOffset)
+                    if (chanceOfBlock < biomeCombineValue)
                     {
 
                         if (prev == (short)BLOCKID.Air)

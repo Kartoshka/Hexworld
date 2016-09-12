@@ -465,6 +465,18 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.38305378
+      value: 0.039182726
+      inSlope: -0.6351156
+      outSlope: -0.6351156
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.4364733
+      value: -0.0051777363
+      inSlope: -0.8842163
+      outSlope: -0.8842163
+      tangentMode: 0
+    - serializedVersion: 2
       time: 0.5
       value: -1
       inSlope: 0
@@ -497,14 +509,14 @@ MonoBehaviour:
     - serializedVersion: 2
       time: 0.4
       value: 0
-      inSlope: -1.9794722
-      outSlope: -1.9794722
+      inSlope: -1.0229268
+      outSlope: -1.0229268
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.7
-      value: 0
-      inSlope: -2.9235277
-      outSlope: -2.9235277
+      time: 0.69863576
+      value: -0.08055555
+      inSlope: -0.693566
+      outSlope: -0.693566
       tangentMode: 0
     - serializedVersion: 2
       time: 0.8
@@ -537,13 +549,19 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.2
-      value: 0
-      inSlope: 0
-      outSlope: 0
+      time: 0.1909947
+      value: 0.12409737
+      inSlope: -2.1967845
+      outSlope: -2.1967845
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.35
+      time: 0.4439832
+      value: 0.14577553
+      inSlope: 1.6555206
+      outSlope: 1.6555206
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.6
       value: 1
       inSlope: 0
       outSlope: 0
@@ -605,6 +623,11 @@ MonoBehaviour:
   octaveSeeds: 2bdf0000000000003f40000000000000f46a070000000000
   pScale: 0.02
   pScale2: 0.008
+  pScale_octaves: 0.01
+  pScale_height: 0.0075
+  pScale_mix: 0.0075
+  pOff_height: 1337
+  pOff_mix: 1337
   chunks: []
   chunkModifiers:
   - {fileID: 575319497}
