@@ -46,6 +46,7 @@ public class ChunkManager : MonoBehaviour {
     public float pScale_mix = 0.0075f;
     public float pOff_height = 6969f;
     public float pOff_mix = 1337f;
+    
 
     //private float pOff = 170282300000000000000000000000000000000f;
     private float pOff = 100000f;
@@ -178,13 +179,15 @@ public class ChunkManager : MonoBehaviour {
                     }
 
                     chanceOfBlock = chanceOfBlock / weightSum;
+
+                    int grassCutoff = maxNumBlocks / 2 - 30;
                     
 
                     //if(k < heightOffset)
-                    if (chanceOfBlock < biomeCombineValue)
+                    if (chanceOfBlock < biomeCombineValue && chanceOfBlock < cavesValue)
                     {
 
-                        if (prev == (short)BLOCKID.Air)
+                        if (prev == (short)BLOCKID.Air && k > grassCutoff)
                         {
                             blockValues[i, j, k] = (short)BLOCKID.Grass;
                         }
