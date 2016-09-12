@@ -25,21 +25,21 @@ public class ChunkManager : MonoBehaviour {
     public AnimationCurve densityCurve_caves;
     public AnimationCurve densityMixFactor;
 
-    public int size;
-    public int maxNumBlocks;
+    public int size = 16;
+    public int maxNumBlocks = 512;
     public float blockSize = 0.25f;
     public long gameSeed;
 
-    public int[] octaveDistances;
-    public float[] octaveWeights;
-    public long[] octaveSeeds;
+    public int[] octaveDistances = { 8, 32, 128};
+    public float[] octaveWeights = { 1, 2, 3};
+    public long[] octaveSeeds = { 57131, 16447, 486132};
 
     private TrilinearInterpolation[] interpolators;
 
     private enum BLOCKID : short { Air = 0, Stone = 1, Dirt = 2, Grass = 3 };
 
-    public float pScale;
-    public float pScale2;
+    public float pScale = 0.02f;
+    public float pScale2 = 0.008f;
 
 
     [SerializeField]
