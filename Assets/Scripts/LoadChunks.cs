@@ -14,7 +14,8 @@ public class LoadChunks : AbChunkModifier
     {
         awaitingInstantiation = new Queue<ChunkManager.Chunk>();
         ChunkManager.Chunk c = cManager.getNewChunkData(cManager.findCurrentChunk());
-        cManager.instantiateChunk(c.pos, cManager.size, cManager.maxNumBlocks, c.blockTypes);
+        //cManager.instantiateChunk(c.pos, cManager.size, cManager.maxNumBlocks, c.blockTypes);
+		cManager.instantiateChunk(c);
 
         this.verifySurroundings(cManager);
         StartCoroutine(TraverseList(cManager));
@@ -46,7 +47,8 @@ public class LoadChunks : AbChunkModifier
             while (awaitingInstantiation.Count > 0)
             {
                 ChunkManager.Chunk c = awaitingInstantiation.Dequeue();
-                cManager.instantiateChunk(c.pos, c.size, 512, c.blockTypes);
+                //cManager.instantiateChunk(c.pos, c.size, 512, c.blockTypes);
+				cManager.instantiateChunk(c);
             }
         }
         traversal = null;

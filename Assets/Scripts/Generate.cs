@@ -140,7 +140,7 @@ public class Generate : MonoBehaviour {
 		result.size = size;
 		result.pos = cPos;
 
-		return result;//blockValues;
+		return result;
     }
 
 

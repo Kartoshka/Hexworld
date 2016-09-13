@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Consts;
 
 public class ChunkManager : MonoBehaviour {
 
@@ -35,8 +36,7 @@ public class ChunkManager : MonoBehaviour {
     public long[] octaveSeeds = { 57131, 16447, 486132};
 
     private TrilinearInterpolation[] interpolators;
-
-    private enum BLOCKID : short { Air = 0, Stone = 1, Dirt = 2, Grass = 3 };
+    
 
     public float pScale = 0.02f;
     public float pScale2 = 0.008f;
@@ -122,6 +122,8 @@ public class ChunkManager : MonoBehaviour {
         }
         */
 
+		List<Block> blocks = new List<Block> ();
+
         //First pass for main stone generation
         for (int i = 0; i < size; i++)
         {
@@ -134,20 +136,11 @@ public class ChunkManager : MonoBehaviour {
                 short prev = (short)BLOCKID.Air;
                 int dirtCount = 0;
 
+				int blockStart = 0;
+
                 for (int k = maxNumBlocks - 1; k >= 0; k--)
                 {
-
-
-
-                    /*
-                    AnimationCurve newCurve1 = new AnimationCurve(curve.keys);
-                    AnimationCurve newCurve2 = new AnimationCurve(curve2.keys);
-
-                    float perlinValue = Mathf.PerlinNoise(blockX * pScale, blockZ * pScale);
-                    float perlinValue2 = Mathf.PerlinNoise((blockX + 456456) * pScale2, (blockZ + 12123) * pScale2); //random numbers to offset the noise so not same as perlinValue
-                    float heightFactor = ((float)k / maxNumBlocks) - (perlinValue2 * 0.25f); //Not sure what this 0.25f is, may or may not be min block height, should be looked into
-                    float combinedCurveValue = (perlinValue * newCurve1.Evaluate(heightFactor)) + ((1.0f - perlinValue) * newCurve2.Evaluate(heightFactor)); //Mixing two curves based on noise
-                    */
+                    
 
                     float heightFactor = (float)k / (float)maxNumBlocks;
 
@@ -183,7 +176,6 @@ public class ChunkManager : MonoBehaviour {
                     int grassCutoff = maxNumBlocks / 2 - 30;
                     
 
-                    //if(k < heightOffset)
                     if (chanceOfBlock < biomeCombineValue && chanceOfBlock < cavesValue)
                     {
 
@@ -208,13 +200,25 @@ public class ChunkManager : MonoBehaviour {
 
                     }
 
-                    prev = blockValues[i, j, k];
 
+					if (blockValues[i, j, k] != prev || k == 0)
+					{
+						if (prev != (short)BLOCKID.Air)
+						{
+							blocks.Add(new Block(new Vector3(blockX, k * blockSize, blockZ), (blockStart-k) * blockSize, prev));
+						}
+
+						blockStart = k;
+					}
+
+
+                    prev = blockValues[i, j, k];
                 }
             }
         }
 
-        Chunk result = new Chunk();
+		Chunk result = new Chunk();
+		result.blocks = blocks;
         result.blockTypes = blockValues;
         result.size = size;
         result.pos = cPos;
@@ -229,87 +233,47 @@ public class ChunkManager : MonoBehaviour {
         return this.getNewChunkData(cPos, this.size, this.maxNumBlocks);
     }
 
-    public Chunk instantiateChunk(Vector2 cPos, int size, int maxNumBlocks, short[,,] blockValues)
+    //public Chunk instantiateChunk(Vector2 cPos, int size, int maxNumBlocks, short[,,] blockValues)
+	public Chunk instantiateChunk(Chunk c)
     {
+		
         GameObject holder = new GameObject("Holder of chunk of size " + size);
         if (chunks == null)
         {
             chunks = new List<Chunk>();
         }
 
+		c.hexObjs = new List<GameObject>();
 
-        int chunkX = Mathf.FloorToInt(cPos.x);
-        int chunkZ = Mathf.FloorToInt(cPos.y);
+		foreach (Block b in c.blocks) {
+			GameObject hObj = null;
+			if (b.blockType == (short)BLOCKID.Stone)
+			{
+				hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
+			}
+			else if (b.blockType == (short)BLOCKID.Dirt)
+			{
+				hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
+			}
+			else if (b.blockType == (short)BLOCKID.Grass)
+			{
+				hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
+			}
+
+			if (hObj != null) {
+				c.hexObjs.Add(hObj);
+				hObj.transform.SetParent(holder.transform);
+
+				hObj.transform.localScale = new Vector3(1, 1, b.vertScale);
+				hObj.transform.localPosition = b.pos;
+				scaleUV(hObj);
+			}
+		}
 
 
-        float deltaX = (float)chunkX * (size * xDistanceBlocks);
-        float deltaZ = (float)chunkZ * (size * zDistanceBlocks);
-
-        //Initialize our chunk
-        Chunk result = new Chunk();
-        result.hexObjs = new List<GameObject>();
-        result.pos = new Vector2(chunkX, chunkZ);
-        result.size = size;
-        //result.blockTypes = blockValues;
-
-
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
-
-                float blockX = i * 0.866f * 2.0f + (j % 2) * 0.866f + deltaX;
-
-                float blockZ = j * 1.5f + deltaZ;
-
-                short previousID = (short)BLOCKID.Air;
-                int blockStart = 0;
-
-                for (int k = 0; k < maxNumBlocks; k++)
-                {
-                    short id = blockValues[i, j, k];
-
-                    if (id != previousID || k == maxNumBlocks)
-                    {
-                        //instantiate block if not air
-                        if (previousID != (short)BLOCKID.Air)
-                        {
-                            GameObject hObj = null;
-                            if (previousID == (short)BLOCKID.Stone)
-                            {
-                                hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
-                            }
-                            else if (previousID == (short)BLOCKID.Dirt)
-                            {
-                                hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
-                            }
-                            else if (previousID == (short)BLOCKID.Grass)
-                            {
-                                hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
-                            }
-
-                            result.hexObjs.Add(hObj);
-                            hObj.transform.SetParent(holder.transform);
-
-                            hObj.transform.localScale = new Vector3(1, 1, (k - blockStart) * blockSize);
-                            hObj.transform.localPosition = new Vector3(blockX, blockStart * blockSize, blockZ);
-                            scaleUV(hObj);
-                        }
-
-                        blockStart = k;
-                        previousID = id;
-                    }
-                    else
-                    {
-                        //nothing to do
-                    }
-                }
-            }
-        }
-        
-        chunks.Add(result);
-        loadedChunks.Add(result.pos, result);
-        return result;
+        chunks.Add(c);
+        loadedChunks.Add(c.pos, c);
+        return c;
     }
 
     //Scale the UV coordinates of a block's mesh
@@ -392,5 +356,6 @@ public class ChunkManager : MonoBehaviour {
         public Vector3 pos;
         public List<GameObject> hexObjs;
         public short[,,] blockTypes;
+		public List<Block> blocks;
     }
 }
