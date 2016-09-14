@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4000010287829614}
   - component: {fileID: 33000010101106810}
   - component: {fileID: 23000013841851238}
-  - component: {fileID: 95000012233062424}
   - component: {fileID: 64000010580748240}
   m_Layer: 0
   m_Name: HB_Stone
@@ -95,20 +94,3 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 6cdeca1cdf400e843a1b9e0853494b7f, type: 3}
---- !u!95 &95000012233062424
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012078384566}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 6cdeca1cdf400e843a1b9e0853494b7f, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
