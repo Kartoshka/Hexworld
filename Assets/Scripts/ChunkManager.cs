@@ -55,6 +55,8 @@ public class ChunkManager : MonoBehaviour {
     private List<Chunk> chunks;
 
     Dictionary<Vector2, Chunk> loadedChunks;
+	Dictionary<Vector2, bool> generatingChunks;
+
     private Vector2 currentChunkPos;
 
     public AbChunkModifier[] chunkModifiers;
@@ -63,8 +65,10 @@ public class ChunkManager : MonoBehaviour {
     void Start () {
 
         loadedChunks = new Dictionary<Vector2, Chunk>();
+		generatingChunks = new Dictionary<Vector2, bool> ();
         interpolators = new TrilinearInterpolation[octaveDistances.Length];
-        if (chunkModifiers == null)
+        
+		if (chunkModifiers == null)
         {
             chunkModifiers = new AbChunkModifier[0];
         }
@@ -105,6 +109,8 @@ public class ChunkManager : MonoBehaviour {
 
     public Chunk getNewChunkData(Vector2 cPos, int size, int maxNumBlocks)
     {
+		generatingChunks.Add (cPos, true);
+
         short[,,] blockValues = new short[size, size, maxNumBlocks];
 
         int chunkX = Mathf.FloorToInt(cPos.x);
@@ -270,9 +276,12 @@ public class ChunkManager : MonoBehaviour {
 			}
 		}
 
+		//Combine meshes
+
 
         chunks.Add(c);
         loadedChunks.Add(c.pos, c);
+		generatingChunks.Remove(c.pos);
         return c;
     }
 
@@ -341,6 +350,15 @@ public class ChunkManager : MonoBehaviour {
     {
         return loadedChunks.ContainsKey(cPos);
     }
+
+	public bool chunkIsGenerating(Vector2 cPos){
+		return generatingChunks.ContainsKey (cPos);
+	}
+
+	public int numChunksGenerating(){
+		return generatingChunks.Count;
+	}
+
     public Vector2 findCurrentChunk()
     {
         int x = Mathf.FloorToInt(trackedObject.transform.position.x / ((float)size * xDistanceBlocks));

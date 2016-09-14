@@ -66,7 +66,7 @@ public class LoadChunks : AbChunkModifier
         {
             for (int k = 0; k < squareSize; k++)
             {
-                if (!cManager.chunkIsLoaded(new Vector2(startX + i, startZ + k)))
+				if (!cManager.chunkIsLoaded(new Vector2(startX + i, startZ + k)) && !cManager.chunkIsGenerating(new Vector2(startX + i, startZ + k)) && cManager.numChunksGenerating() < 2)
                 {
                     this.StartCoroutineAsync(chunkGenThread(cManager, new Vector2(startX + i, startZ + k)));
                 }
