@@ -16,14 +16,13 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 4000011934632326}
-  - 33: {fileID: 33000011520079006}
-  - 23: {fileID: 23000010022600486}
-  - 95: {fileID: 95000012447720480}
-  - 64: {fileID: 64000010893924436}
-  - 54: {fileID: 54000011842965504}
+  - component: {fileID: 4000011934632326}
+  - component: {fileID: 33000011520079006}
+  - component: {fileID: 23000010022600486}
+  - component: {fileID: 95000012447720480}
+  - component: {fileID: 64000010893924436}
   m_Layer: 0
   m_Name: HB_Dirt
   m_TagString: Untagged
@@ -40,10 +39,10 @@ Transform:
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -145.8034, y: 127.90649, z: -21.273186}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!23 &23000010022600486
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -58,7 +57,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 9ebfe8cc88c1b7a469ca26cb3a928a38, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
@@ -80,21 +81,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000013599204602}
   m_Mesh: {fileID: 4300000, guid: 6cdeca1cdf400e843a1b9e0853494b7f, type: 3}
---- !u!54 &54000011842965504
-Rigidbody:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000013599204602}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!64 &64000010893924436
 MeshCollider:
   m_ObjectHideFlags: 1
@@ -106,6 +92,8 @@ MeshCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 6cdeca1cdf400e843a1b9e0853494b7f, type: 3}
 --- !u!95 &95000012447720480
 Animator:
