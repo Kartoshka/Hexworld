@@ -277,13 +277,87 @@ public class ChunkManager : MonoBehaviour {
 		}
 
 		//Combine meshes
-
+		combineBlockMeshes(holder);
 
         chunks.Add(c);
         loadedChunks.Add(c.pos, c);
 		generatingChunks.Remove(c.pos);
         return c;
     }
+
+	//Combine a bunch of block meshes into one mesh
+	public void combineBlockMeshes(GameObject parent){
+
+
+		parent.AddComponent<MeshFilter>();
+		parent.AddComponent<MeshRenderer>();
+
+		MeshFilter[]  filters = parent.GetComponentsInChildren<MeshFilter>();
+		List<Material> materials = new List<Material> ();
+		MeshRenderer[] renderers = parent.GetComponentsInChildren<MeshRenderer> (false);
+
+
+
+		foreach (MeshRenderer renderer in renderers) {
+			if (renderer.transform == parent.transform)
+				continue;
+			Material[] localMats = renderer.sharedMaterials;
+			foreach (Material localMat in localMats) {
+				if (!materials.Contains (localMat))
+					materials.Add (localMat);
+			}
+		}
+
+		parent.GetComponent<MeshRenderer> ().materials = materials.ToArray();
+
+		List<Mesh> submeshes = new List<Mesh> ();
+
+		foreach (Material material in materials) {
+			
+			List<CombineInstance> combiners = new List<CombineInstance> ();
+
+			foreach (MeshFilter filter in filters) {
+				
+				MeshRenderer renderer = filter.GetComponent<MeshRenderer> ();
+				if (renderer == null)
+					continue;
+
+				Material[] localMaterials = renderer.sharedMaterials;
+				for (int materialIndex = 0; materialIndex < localMaterials.Length; materialIndex++) {
+					if (localMaterials [materialIndex] != material)
+						continue;
+
+					CombineInstance ci = new CombineInstance ();
+					ci.mesh = filter.sharedMesh;
+					ci.subMeshIndex = materialIndex;
+					ci.transform = filter.transform.localToWorldMatrix;
+					combiners.Add (ci);
+				}
+			}
+
+			Mesh mesh = new Mesh ();
+			mesh.CombineMeshes (combiners.ToArray(), true);
+			submeshes.Add (mesh);
+		}
+
+		List<CombineInstance> finalCombiners = new List<CombineInstance> ();
+		foreach (Mesh mesh in submeshes) {
+			CombineInstance ci = new CombineInstance ();
+			ci.mesh = mesh;
+			ci.subMeshIndex = 0;
+			ci.transform = Matrix4x4.identity;
+			finalCombiners.Add (ci);
+		}
+
+		Mesh finalMesh = new Mesh ();
+		finalMesh.CombineMeshes (finalCombiners.ToArray(), false);
+		parent.GetComponent<MeshFilter> ().sharedMesh = finalMesh;
+
+		for (int a = 0; a < parent.transform.childCount; a++) {
+			parent.transform.GetChild (a).gameObject.GetComponent<MeshRenderer> ().enabled = false;
+		}
+			
+	}
 
     //Scale the UV coordinates of a block's mesh
     private void scaleUV(GameObject obj)
