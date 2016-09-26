@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NoiseTest;
@@ -12,6 +13,8 @@ public class TrilinearInterpolation
     [SerializeField]
     public int interpolationDistance;
 
+	public int dicHits = 0;
+	public int dicMisses = 0;
 
     public TrilinearInterpolation(int distanceInterpolation) : this(System.DateTime.Now.Ticks, distanceInterpolation)
     { }
@@ -33,7 +36,22 @@ public class TrilinearInterpolation
         {
             noise = new OpenSimplexNoise();
         }
-        return (float)noise.Evaluate(x, y, z);
+		float result = 0;
+		Vector3 key = new Vector3 (x, y, z);
+		if (interpolators.ContainsKey (key)) {
+			result = interpolators [key];
+			dicHits++;
+		} else {
+			result = (float)noise.Evaluate (x, y, z);
+			dicMisses++;
+
+			try{
+				interpolators.Add(key,result);
+			}catch(ArgumentException e){
+				//Already in dictionnary because of other thread, oh well.
+			}
+		}
+		return result;
     }
 
     //http://paulbourke.net/miscellaneous/interpolation/

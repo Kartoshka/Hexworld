@@ -48,7 +48,6 @@ public class ChunkManager : MonoBehaviour {
     public float pOff_mix = 1337f;
     
 
-    //private float pOff = 170282300000000000000000000000000000000f;
     private float pOff = 100000f;
 
     [SerializeField]
@@ -79,6 +78,7 @@ public class ChunkManager : MonoBehaviour {
         }
         currentChunkPos = findCurrentChunk();
 
+
         foreach (AbChunkModifier cMod in chunkModifiers)
         {
             cMod.OnChunkManagerStart(this);
@@ -105,6 +105,12 @@ public class ChunkManager : MonoBehaviour {
             }
             cMod.OnChunkManagerUpdate(this);
         }
+
+		if (chunks.Count == 9) {
+			foreach (TrilinearInterpolation tp in interpolators) {
+				Debug.Log ("Hits " + tp.dicHits + " misses " + tp.dicMisses);
+			}
+		}
     }
 
     public Chunk getNewChunkData(Vector2 cPos, int size, int maxNumBlocks)
@@ -119,14 +125,6 @@ public class ChunkManager : MonoBehaviour {
 
         float deltaX = (float)chunkX * (size * xDistanceBlocks);
         float deltaZ = (float)chunkZ * (size * zDistanceBlocks);
-
-        /*
-        float sum = 0;
-        foreach (float f in octaveWeights)
-        {
-            sum += f;
-        }
-        */
 
 		List<Block> blocks = new List<Block> ();
 
