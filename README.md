@@ -1,5 +1,4 @@
 # Hexacraft
-
 Procedurally generated Minecraft-style terrain using hextiles instead of square tiles.
 
 ![Img1](http://i.imgur.com/aQuZsrC.png)
