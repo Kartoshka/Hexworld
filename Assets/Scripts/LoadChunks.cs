@@ -18,9 +18,9 @@ public class LoadChunks : AbChunkModifier
 		cManager.instantiateChunk(c);
 
         this.verifySurroundings(cManager,2);
-        StartCoroutine(TraverseList(cManager));
+
 		this.StartCoroutineAsync (continuousGenThread (cManager));
-		this.StartCoroutineAsync (continuousGenThread (cManager));
+		//this.StartCoroutineAsync (continuousGenThread (cManager));
 
     }
     public override void OnMoveChunks(ChunkManager cManager)
@@ -38,17 +38,28 @@ public class LoadChunks : AbChunkModifier
 
     private IEnumerator TraverseList(ChunkManager cManager)
     {
+		int startFrame = Environment.TickCount;
         if (awaitingInstantiation == null)
         {
             yield return null;
         }
         else
         {
+			int timeTaken = 0;
             while (awaitingInstantiation.Count > 0)
             {
+				
                 ChunkManager.Chunk c = awaitingInstantiation.Dequeue();
                 //cManager.instantiateChunk(c.pos, c.size, 512, c.blockTypes);
 				cManager.instantiateChunk(c);
+				int instantiationTime = (Environment.TickCount - startFrame);
+				startFrame = Environment.TickCount;
+				timeTaken += instantiationTime;
+				if (timeTaken > 16.67) {
+					break;
+				} else if ((timeTaken + instantiationTime) > 16.67) {
+					break;
+				}
             }
         }
         traversal = null;
@@ -61,8 +72,6 @@ public class LoadChunks : AbChunkModifier
 
         int startX = (int)currentChunk.x;
         int startZ = (int)currentChunk.y;
-
-        //int squareSize = 2 * radius + 1;
 
 		List<Vector3> chunks = new List<Vector3>();
 
@@ -90,7 +99,7 @@ public class LoadChunks : AbChunkModifier
 		}
 
 		for (int c = 0; c < chunks.Count; c++) {
-			if (chunks[c][2] < radius+0.5 && !cManager.chunkIsLoaded (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1])) && !cManager.chunkIsGenerating (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1])) && cManager.numChunksGenerating () < 2) {
+			if (chunks[c][2] < radius+0.5 && !cManager.chunkIsLoaded (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1])) && !cManager.chunkIsGenerating (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]))) {
 				requests.Enqueue (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]));
 			}
 		}
