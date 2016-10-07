@@ -11,11 +11,17 @@ public class LoadChunks : AbChunkModifier
     private Coroutine traversal;
 
 	public int numThreads =1;
+
+
+	public Dictionary<Vector2,bool> currentlyGenerating;
+
 	#region AbChunkModifier methods
     public override void OnChunkManagerStart(ChunkManager cManager)
     {
         run = true;
         awaitingInstantiation = new Queue<ChunkManager.Chunk>();
+		currentlyGenerating = new Dictionary<Vector2, bool> ();
+
         ChunkManager.Chunk c = cManager.getNewChunkData(cManager.findCurrentChunk());
 		cManager.instantiateChunk(c);
 
@@ -122,8 +128,9 @@ public class LoadChunks : AbChunkModifier
 
 		for (int c = 0; c < chunks.Count; c++) {
 			Vector2 pos = new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]);
-			if (!requests.Contains(pos) && chunks[c][2] < radius+0.5 && !cManager.chunkIsLoaded (pos) && !cManager.chunkIsGenerating (pos)) {
-				requests.Enqueue (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]));
+			if (!currentlyGenerating.ContainsKey(pos) && chunks[c][2] < radius+0.5 && !cManager.chunkIsLoaded (pos) && !cManager.chunkIsGenerating (pos)) {
+				requests.Enqueue (pos);
+				currentlyGenerating.Add (pos, true);
 			}
 		}
 
@@ -156,6 +163,7 @@ public class LoadChunks : AbChunkModifier
             if (gen)
             {
                 ChunkManager.Chunk c = cManager.getNewChunkData(pos);
+				currentlyGenerating.Remove (pos);
                 awaitingInstantiation.Enqueue(c);
             }
 		}
