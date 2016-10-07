@@ -12,21 +12,20 @@ public class LoadChunks : AbChunkModifier
 
     public override void OnChunkManagerStart(ChunkManager cManager)
     {
+        run = true;
         awaitingInstantiation = new Queue<ChunkManager.Chunk>();
         ChunkManager.Chunk c = cManager.getNewChunkData(cManager.findCurrentChunk());
-        //cManager.instantiateChunk(c.pos, cManager.size, cManager.maxNumBlocks, c.blockTypes);
 		cManager.instantiateChunk(c);
 
-        this.verifySurroundings(cManager);
+        this.verifySurroundings(cManager,radius*2);
         StartCoroutine(TraverseList(cManager));
 		this.StartCoroutineAsync (continuousGenThread (cManager));
 		this.StartCoroutineAsync (continuousGenThread (cManager));
 
-
     }
     public override void OnMoveChunks(ChunkManager cManager)
     {
-        this.verifySurroundings(cManager);
+        this.verifySurroundings(cManager,radius);
     }
 
     public override void OnChunkManagerUpdate(ChunkManager cManager)
@@ -56,7 +55,7 @@ public class LoadChunks : AbChunkModifier
         yield return null;
     }
 
-    private void verifySurroundings(ChunkManager cManager)
+    private void verifySurroundings(ChunkManager cManager,int radius)
     {
         Vector2 currentChunk = cManager.findCurrentChunk();
 
@@ -72,11 +71,13 @@ public class LoadChunks : AbChunkModifier
 				if (!cManager.chunkIsLoaded(new Vector2(startX + i, startZ + k)) && !cManager.chunkIsGenerating(new Vector2(startX + i, startZ + k)) && cManager.numChunksGenerating() < 2)
                 {
 					requests.Enqueue(new Vector2(startX + i, startZ + k));
-                   // this.StartCoroutineAsync(chunkGenThread(cManager, new Vector2(startX + i, startZ + k)));
+                    //this.StartCoroutineAsync(chunkGenThread(cManager, new Vector2(startX + i, startZ + k)));
                 }
             }
         }
     }
+
+    
 
     private IEnumerator chunkGenThread(ChunkManager cManager, Vector2 cPos)
     {
@@ -85,17 +86,33 @@ public class LoadChunks : AbChunkModifier
         yield return null;
     }
 
-
+    private bool run = true;
 	private Queue<Vector2> requests = new Queue<Vector2>();
+    private object requestLock = new object();
 	public IEnumerator continuousGenThread(ChunkManager cManager){
-		while (true) {
-			if (requests.Count > 0) {
-				Vector2 pos = requests.Dequeue ();
-				ChunkManager.Chunk c = cManager.getNewChunkData(pos);
-				awaitingInstantiation.Enqueue(c);
-			}
+		while (run) {
+            bool gen = false;
+            Vector2 pos = Vector2.zero;
+            lock (requestLock)
+            {
+                if (requests.Count > 0)
+                {
+                    pos = requests.Dequeue();
+                    gen = true;
+                }
+            }
+            if (gen)
+            {
+                ChunkManager.Chunk c = cManager.getNewChunkData(pos);
+                awaitingInstantiation.Enqueue(c);
+            }
 		}
 		yield return null;
 	}
+
+    public void OnApplicationQuit()
+    {
+        run = false;
+    }
 
 }
