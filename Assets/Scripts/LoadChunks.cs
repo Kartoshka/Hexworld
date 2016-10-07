@@ -19,7 +19,7 @@ public class LoadChunks : AbChunkModifier
         ChunkManager.Chunk c = cManager.getNewChunkData(cManager.findCurrentChunk());
 		cManager.instantiateChunk(c);
 
-        this.verifySurroundings(cManager,2);
+        this.verifySurroundings(cManager,4);
 
 		//How many threads concurrently run and generate chunk data
 		for (int t = 0; t < numThreads; t++) {

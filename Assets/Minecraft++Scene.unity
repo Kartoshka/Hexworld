@@ -367,7 +367,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  size: 16
+  size: 4
   maxNumBlocks: 512
   blockSize: 0.25
   gameSeed: 3150
@@ -401,7 +401,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae03018aecc9c0d47abefdb9321e1bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 1
+  radius: 32
+  numThreads: 1
 --- !u!1 &620707949
 GameObject:
   m_ObjectHideFlags: 0
