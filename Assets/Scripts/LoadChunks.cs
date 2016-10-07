@@ -10,6 +10,7 @@ public class LoadChunks : AbChunkModifier
     public int radius;
     private Coroutine traversal;
 
+	public int numThreads =1;
 	#region AbChunkModifier methods
     public override void OnChunkManagerStart(ChunkManager cManager)
     {
@@ -21,8 +22,9 @@ public class LoadChunks : AbChunkModifier
         this.verifySurroundings(cManager,2);
 
 		//How many threads concurrently run and generate chunk data
-		this.StartCoroutineAsync (continuousGenThread (cManager));
-		//this.StartCoroutineAsync (continuousGenThread (cManager));
+		for (int t = 0; t < numThreads; t++) {
+			this.StartCoroutineAsync (continuousGenThread (cManager));
+		}
 
     }
     public override void OnMoveChunks(ChunkManager cManager)
