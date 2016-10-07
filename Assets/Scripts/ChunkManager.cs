@@ -93,6 +93,7 @@ public class ChunkManager : MonoBehaviour {
 
         if(moved)
         {
+			Debug.Log ("Moved chunks!");
             currentChunkPos = pos;
         }
 

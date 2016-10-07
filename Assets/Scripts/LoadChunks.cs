@@ -113,6 +113,7 @@ public class LoadChunks : AbChunkModifier
     public void OnApplicationQuit()
     {
         run = false;
+		StopCoroutine (traversal);
     }
 
 }
