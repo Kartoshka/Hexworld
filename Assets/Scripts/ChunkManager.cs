@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Consts;
+using NoiseTest;
 
 public class ChunkManager : MonoBehaviour {
 
@@ -31,12 +32,11 @@ public class ChunkManager : MonoBehaviour {
     public float blockSize = 0.25f;
     public long gameSeed;
 
-    public int[] octaveDistances = { 8, 32, 128};
+	public float[] octaveZoom =  { 1f, 5f, 10f};
     public float[] octaveWeights = { 1, 2, 3};
     public long[] octaveSeeds = { 57131, 16447, 486132};
 
-    private TrilinearInterpolation[] interpolators;
-    
+	public OpenSimplexNoise[] noise;
 
     public float pScale = 0.02f;
     public float pScale2 = 0.008f;
@@ -62,20 +62,19 @@ public class ChunkManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+		noise = new OpenSimplexNoise[octaveZoom.Length];
+		for(int n=0;n<noise.Length;n++){
+			noise[n] = new OpenSimplexNoise (octaveSeeds[n]*gameSeed);
+		}
 
         loadedChunks = new Dictionary<Vector2, Chunk>();
 		generatingChunks = new Dictionary<Vector2, bool> ();
-        interpolators = new TrilinearInterpolation[octaveDistances.Length];
         
 		if (chunkModifiers == null)
         {
             chunkModifiers = new AbChunkModifier[0];
         }
 
-        for (int d = 0; d < interpolators.Length; d++)
-        {
-            interpolators[d] = new TrilinearInterpolation(gameSeed * octaveSeeds[d], octaveDistances[d]);
-        }
         currentChunkPos = findCurrentChunk();
 
 
@@ -105,12 +104,7 @@ public class ChunkManager : MonoBehaviour {
             }
             cMod.OnChunkManagerUpdate(this);
         }
-
-		if (chunks.Count == 9) {
-			foreach (TrilinearInterpolation tp in interpolators) {
-				Debug.Log ("Hits " + tp.dicHits + " misses " + tp.dicMisses);
-			}
-		}
+			
     }
 
     public Chunk getNewChunkData(Vector2 cPos, int size, int maxNumBlocks)
@@ -127,6 +121,11 @@ public class ChunkManager : MonoBehaviour {
         float deltaZ = (float)chunkZ * (size * zDistanceBlocks);
 
 		List<Block> blocks = new List<Block> ();
+
+		AnimationCurve densityMixFactor_copy = new AnimationCurve(densityMixFactor.keys);
+		AnimationCurve densityCurve_mountains_copy = new AnimationCurve(densityCurve_mountains.keys);
+		AnimationCurve densityCurve_plains_copy = new AnimationCurve(densityCurve_plains.keys);
+		AnimationCurve densityCurve_caves_copy = new AnimationCurve(densityCurve_caves.keys);
 
         //First pass for main stone generation
         for (int i = 0; i < size; i++)
@@ -145,13 +144,7 @@ public class ChunkManager : MonoBehaviour {
                 for (int k = maxNumBlocks - 1; k >= 0; k--)
                 {
                     
-
                     float heightFactor = (float)k / (float)maxNumBlocks;
-
-                    AnimationCurve densityMixFactor_copy = new AnimationCurve(densityMixFactor.keys);
-                    AnimationCurve densityCurve_mountains_copy = new AnimationCurve(densityCurve_mountains.keys);
-                    AnimationCurve densityCurve_plains_copy = new AnimationCurve(densityCurve_plains.keys);
-                    AnimationCurve densityCurve_caves_copy = new AnimationCurve(densityCurve_caves.keys);
 
                     float mixValue = densityMixFactor_copy.Evaluate(Mathf.PerlinNoise(blockX*pScale_mix + pOff_mix + pOff, blockZ*pScale_mix + pOff_mix + pOff));
                     float heightOffset = 0.3f*Mathf.PerlinNoise(blockX * pScale_height + pOff_height + pOff, blockZ * pScale_height + pOff_height + pOff);
@@ -161,17 +154,15 @@ public class ChunkManager : MonoBehaviour {
                     float cavesValue = densityCurve_caves_copy.Evaluate(heightFactor);
 
                     float biomeCombineValue = ((1-mixValue) * mountainValue) + ((mixValue) * plainsValue);
+				
 
-                    //float caveCombineValue = biomeCombineValue + (cavesValue - 1);
+					double chanceOfBlock = 0.0f;
+					double weightSum = 0;
 
-
-                    float chanceOfBlock = 0.0f;
-                    float weightSum = 0;
-
-                    for (int oct = 0; oct < interpolators.Length; oct++)
+					for (int n = 0; n < noise.Length; n++)
                     {
-                        float newWeight = octaveWeights[oct]*0.5f + octaveWeights[oct]*Mathf.PerlinNoise(blockX*pScale_octaves + (float)octaveSeeds[oct] + pOff, blockZ*pScale_octaves + (float)octaveSeeds[oct] + pOff);
-                        chanceOfBlock += interpolators[oct].trilinearInterpolation(blockX, (float)k * blockSize, blockZ) * newWeight;
+						double newWeight = octaveWeights[n]*0.5f + octaveWeights[n]*Mathf.PerlinNoise(blockX*pScale_octaves + (float)octaveSeeds[n] + pOff, blockZ*pScale_octaves + (float)octaveSeeds[n] + pOff);
+						chanceOfBlock += noise[n].Evaluate(blockX*(1f/octaveZoom[n]), (float)k * blockSize*(1f/octaveZoom[n]), blockZ*(1f/octaveZoom[n])) * newWeight;
                         weightSum += newWeight;
                     }
 
@@ -201,7 +192,6 @@ public class ChunkManager : MonoBehaviour {
                     else
                     {
                         blockValues[i, j, k] = (short)BLOCKID.Air;
-
                     }
 
 
@@ -284,9 +274,8 @@ public class ChunkManager : MonoBehaviour {
     }
 
 	//Combine a bunch of block meshes into one mesh
-	public void combineBlockMeshes(GameObject parent){
-
-
+	public void combineBlockMeshes(GameObject parent)
+	{
 		parent.AddComponent<MeshFilter>();
 		parent.AddComponent<MeshRenderer>();
 
@@ -354,7 +343,6 @@ public class ChunkManager : MonoBehaviour {
 		for (int a = 0; a < parent.transform.childCount; a++) {
 			parent.transform.GetChild (a).gameObject.GetComponent<MeshRenderer> ().enabled = false;
 		}
-			
 	}
 
     //Scale the UV coordinates of a block's mesh

@@ -19,6 +19,9 @@ public class LoadChunks : AbChunkModifier
 
         this.verifySurroundings(cManager);
         StartCoroutine(TraverseList(cManager));
+		this.StartCoroutineAsync (continuousGenThread (cManager));
+		this.StartCoroutineAsync (continuousGenThread (cManager));
+
 
     }
     public override void OnMoveChunks(ChunkManager cManager)
@@ -68,7 +71,8 @@ public class LoadChunks : AbChunkModifier
             {
 				if (!cManager.chunkIsLoaded(new Vector2(startX + i, startZ + k)) && !cManager.chunkIsGenerating(new Vector2(startX + i, startZ + k)) && cManager.numChunksGenerating() < 2)
                 {
-                    this.StartCoroutineAsync(chunkGenThread(cManager, new Vector2(startX + i, startZ + k)));
+					requests.Enqueue(new Vector2(startX + i, startZ + k));
+                   // this.StartCoroutineAsync(chunkGenThread(cManager, new Vector2(startX + i, startZ + k)));
                 }
             }
         }
@@ -80,5 +84,18 @@ public class LoadChunks : AbChunkModifier
         awaitingInstantiation.Enqueue(c);
         yield return null;
     }
+
+
+	private Queue<Vector2> requests = new Queue<Vector2>();
+	public IEnumerator continuousGenThread(ChunkManager cManager){
+		while (true) {
+			if (requests.Count > 0) {
+				Vector2 pos = requests.Dequeue ();
+				ChunkManager.Chunk c = cManager.getNewChunkData(pos);
+				awaitingInstantiation.Enqueue(c);
+			}
+		}
+		yield return null;
+	}
 
 }
