@@ -10,6 +10,7 @@ public class LoadChunks : AbChunkModifier
     public int radius;
     private Coroutine traversal;
 
+	#region AbChunkModifier methods
     public override void OnChunkManagerStart(ChunkManager cManager)
     {
         run = true;
@@ -19,6 +20,7 @@ public class LoadChunks : AbChunkModifier
 
         this.verifySurroundings(cManager,2);
 
+		//How many threads concurrently run and generate chunk data
 		this.StartCoroutineAsync (continuousGenThread (cManager));
 		//this.StartCoroutineAsync (continuousGenThread (cManager));
 
@@ -36,6 +38,19 @@ public class LoadChunks : AbChunkModifier
         }
     }
 
+	public void OnApplicationQuit()
+	{
+		run = false;
+		StopCoroutine (traversal);
+	}
+
+	#endregion
+
+	/// <summary>
+	/// Traverses the list of chunks awaiting instantiation and tries to generate as many of them as it can while staying within 60fps
+	/// </summary>
+	/// <returns>The list.</returns>
+	/// <param name="cManager">C manager.</param>
     private IEnumerator TraverseList(ChunkManager cManager)
     {
 		int startFrame = Environment.TickCount;
@@ -66,6 +81,11 @@ public class LoadChunks : AbChunkModifier
         yield return null;
     }
 
+	/// <summary>
+	/// Verifies chunks around player to see if any need to be loaded
+	/// </summary>
+	/// <param name="cManager">C manager.</param>
+	/// <param name="radius">Radius.</param>
     private void verifySurroundings(ChunkManager cManager,int radius)
     {
         Vector2 currentChunk = cManager.findCurrentChunk();
@@ -104,34 +124,20 @@ public class LoadChunks : AbChunkModifier
 			}
 		}
 
-		/*
-
-        for (int i = 0; i < squareSize; i++)
-        {
-            for (int k = 0; k < squareSize; k++)
-            {
-				if (!cManager.chunkIsLoaded(new Vector2(startX + i, startZ + k)) && !cManager.chunkIsGenerating(new Vector2(startX + i, startZ + k)) && cManager.numChunksGenerating() < 2)
-                {
-					requests.Enqueue(new Vector2(startX + i, startZ + k));
-                    //this.StartCoroutineAsync(chunkGenThread(cManager, new Vector2(startX + i, startZ + k)));
-                }
-            }
-        }
-        */
     }
+		
 
-    
-
-    private IEnumerator chunkGenThread(ChunkManager cManager, Vector2 cPos)
-    {
-        ChunkManager.Chunk c = cManager.getNewChunkData(cPos);
-        awaitingInstantiation.Enqueue(c);
-        yield return null;
-    }
-
+	#region Asynchrounous method body
     private bool run = true;
 	private Queue<Vector2> requests = new Queue<Vector2>();
     private object requestLock = new object();
+
+
+	/// <summary>
+	/// Continuously runs and checks whether there are any requests waiting to be parsed
+	/// </summary>
+	/// <returns>The gen thread.</returns>
+	/// <param name="cManager">C manager.</param>
 	public IEnumerator continuousGenThread(ChunkManager cManager){
 		while (run) {
             bool gen = false;
@@ -153,10 +159,7 @@ public class LoadChunks : AbChunkModifier
 		yield return null;
 	}
 
-    public void OnApplicationQuit()
-    {
-        run = false;
-		StopCoroutine (traversal);
-    }
+	#endregion
+
 
 }
