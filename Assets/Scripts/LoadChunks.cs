@@ -17,7 +17,7 @@ public class LoadChunks : AbChunkModifier
         ChunkManager.Chunk c = cManager.getNewChunkData(cManager.findCurrentChunk());
 		cManager.instantiateChunk(c);
 
-        this.verifySurroundings(cManager,radius*2);
+        this.verifySurroundings(cManager,2);
         StartCoroutine(TraverseList(cManager));
 		this.StartCoroutineAsync (continuousGenThread (cManager));
 		this.StartCoroutineAsync (continuousGenThread (cManager));
@@ -59,10 +59,43 @@ public class LoadChunks : AbChunkModifier
     {
         Vector2 currentChunk = cManager.findCurrentChunk();
 
-        int startX = (int)currentChunk.x - (radius);
-        int startZ = (int)currentChunk.y - (radius);
+        int startX = (int)currentChunk.x;
+        int startZ = (int)currentChunk.y;
 
-        int squareSize = 2 * radius + 1;
+        //int squareSize = 2 * radius + 1;
+
+		List<Vector3> chunks = new List<Vector3>();
+
+		for (int i = -radius; i < radius + 1; i++)
+		{
+			for (int k = -radius; k < radius + 1; k++)
+			{
+				Vector3 cVec = new Vector3 (i, k, Mathf.Sqrt(Mathf.Pow((float)i, 2) + Mathf.Pow((float)k, 2)));
+
+				if (chunks.Count == 0)
+					chunks.Add (cVec);
+				else {
+					bool added = false;
+					for (int d = 0; d < chunks.Count; d++) {
+						if (cVec [2] < chunks [d] [2]) {
+							chunks.Insert (d, cVec);
+							added = true;
+							break;
+						}
+					}
+					if (!added)
+						chunks.Add (cVec);
+				}
+			}
+		}
+
+		for (int c = 0; c < chunks.Count; c++) {
+			if (chunks[c][2] < radius+0.5 && !cManager.chunkIsLoaded (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1])) && !cManager.chunkIsGenerating (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1])) && cManager.numChunksGenerating () < 2) {
+				requests.Enqueue (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]));
+			}
+		}
+
+		/*
 
         for (int i = 0; i < squareSize; i++)
         {
@@ -75,6 +108,7 @@ public class LoadChunks : AbChunkModifier
                 }
             }
         }
+        */
     }
 
     
