@@ -121,14 +121,15 @@ public class LoadChunks : AbChunkModifier
 		}
 
 		for (int c = 0; c < chunks.Count; c++) {
-			if (chunks[c][2] < radius+0.5 && !cManager.chunkIsLoaded (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1])) && !cManager.chunkIsGenerating (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]))) {
+			Vector2 pos = new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]);
+			if (!requests.Contains(pos) && chunks[c][2] < radius+0.5 && !cManager.chunkIsLoaded (pos) && !cManager.chunkIsGenerating (pos)) {
 				requests.Enqueue (new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]));
 			}
 		}
 
     }
 		
-
+	
 	#region Asynchrounous method body
     private bool run = true;
 	private Queue<Vector2> requests = new Queue<Vector2>();
