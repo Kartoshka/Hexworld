@@ -2,8 +2,8 @@
 
 Procedurally generated Minecraft-style terrain using hextiles instead of square tiles.
 
-![alt tag](http://imgur.com/aQuZsrC)
-![alt tag](http://imgur.com/mSEQ9OL)
-![alt tag](http://imgur.com/lUudYQQ)
-![alt tag](http://imgur.com/gSeacS9)
+![Img1](http://imgur.com/aQuZsrC)
+![Img2](http://imgur.com/mSEQ9OL)
+![Img3](http://imgur.com/lUudYQQ)
+![Img3](http://imgur.com/gSeacS9)
 
