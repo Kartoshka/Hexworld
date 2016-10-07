@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae03018aecc9c0d47abefdb9321e1bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 8
   startRadius: 4
   numThreads: 1
 --- !u!4 &26337148
@@ -186,7 +186,7 @@ GameObject:
   - component: {fileID: 575319495}
   - component: {fileID: 575319496}
   m_Layer: 0
-  m_Name: GenerateEmpty
+  m_Name: ChunkManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
