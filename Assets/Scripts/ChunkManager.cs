@@ -276,6 +276,7 @@ public class ChunkManager : MonoBehaviour {
 	//Combine a bunch of block meshes into one mesh
 	public void combineBlockMeshes(GameObject parent)
 	{
+        MeshCollider collider = parent.AddComponent<MeshCollider>();
 		parent.AddComponent<MeshFilter>();
 		parent.AddComponent<MeshRenderer>();
 
@@ -340,9 +341,21 @@ public class ChunkManager : MonoBehaviour {
 		finalMesh.CombineMeshes (finalCombiners.ToArray(), false);
 		parent.GetComponent<MeshFilter> ().sharedMesh = finalMesh;
 
-		for (int a = 0; a < parent.transform.childCount; a++) {
-			parent.transform.GetChild (a).gameObject.GetComponent<MeshRenderer> ().enabled = false;
-		}
+        Transform[] children = parent.GetComponentsInChildren<Transform>();
+        //for (int a = 0; a < parent.transform.childCount; a++) {
+        //	//parent.transform.GetChild (a).gameObject.GetComponent<MeshRenderer> ().enabled = false;
+        //          parent.transform.GetChild(a)
+        //}
+
+        foreach (Transform t in children)
+        {
+            if (t != parent.transform)
+            {
+                Destroy(t.gameObject);
+            }
+        }
+
+        collider.sharedMesh = finalMesh;
 	}
 
     //Scale the UV coordinates of a block's mesh
