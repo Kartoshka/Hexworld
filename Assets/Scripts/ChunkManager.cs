@@ -108,6 +108,16 @@ public class ChunkManager : MonoBehaviour {
 			
     }
 
+
+	void OnApplicationQuit(){
+
+		foreach (Chunk c in loadedChunks) {
+			foreach(GameObject gObj in c.hexObjs){
+				Destroy (gObj);
+			}
+		}
+	}
+	#region ChunkGeneration and Instantiation
     public Chunk getNewChunkData(Vector2 cPos, int size, int maxNumBlocks)
     {
 		generatingChunks.Add (cPos, true);
@@ -256,7 +266,7 @@ public class ChunkManager : MonoBehaviour {
 			}
 
 			if (hObj != null) {
-				c.hexObjs.Add(hObj);
+				//c.hexObjs.Add(hObj);
 				hObj.transform.SetParent(holder.transform);
 
 				hObj.transform.localScale = new Vector3(1, 1, b.vertScale);
@@ -264,7 +274,7 @@ public class ChunkManager : MonoBehaviour {
 				scaleUV(hObj);
 			}
 		}
-
+		c.hexObjs.Add (holder);
 		//Combine meshes
 		combineBlockMeshes(holder);
 
@@ -274,6 +284,9 @@ public class ChunkManager : MonoBehaviour {
         return c;
     }
 
+	#endregion
+
+	#region MeshCombination
 	//Combine a bunch of block meshes into one mesh
 	public void combineBlockMeshes(GameObject parent)
 	{
@@ -388,6 +401,9 @@ public class ChunkManager : MonoBehaviour {
 
     }
 
+	#endregion
+
+	#region Accessors
     public Vector2[] getChunkPositions() {
         Vector2[] result = new Vector2[loadedChunks.Count];
         loadedChunks.Keys.CopyTo(result, 0);
@@ -440,6 +456,8 @@ public class ChunkManager : MonoBehaviour {
 
         return new Vector2(x, z);
     }
+
+	#endregion
 
     [System.Serializable]
     public struct Chunk
