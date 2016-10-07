@@ -18,7 +18,8 @@ public class UnloadChunks : AbChunkModifier {
 
 		foreach (ChunkManager.Chunk c in loadedChunks)
 		{
-			if(!((c.pos.x <= (currentPos.x+unloadPastDistance) && c.pos.x >=(currentPos.x-unloadPastDistance)) && (c.pos.y <= (currentPos.y+unloadPastDistance) && c.pos.y >=(currentPos.x-unloadPastDistance)))){
+			float distance = Mathf.Sqrt (Mathf.Pow(c.pos.x-currentPos.x,2)+Mathf.Pow(c.pos.y-currentPos.y,2));
+			if (distance > unloadPastDistance) {
 				cManager.DestroyChunk (c.pos);
 			}
 		}
