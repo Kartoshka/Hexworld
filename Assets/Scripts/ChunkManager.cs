@@ -93,7 +93,7 @@ public class ChunkManager : MonoBehaviour {
 
         if(moved)
         {
-			Debug.Log ("Moved chunks!");
+									//This line is to commemorate Eeloo
             currentChunkPos = pos;
         }
 
@@ -111,7 +111,7 @@ public class ChunkManager : MonoBehaviour {
 
 	void OnApplicationQuit(){
 
-		foreach (Chunk c in loadedChunks) {
+		foreach (Chunk c in loadedChunks.Values) {
 			foreach(GameObject gObj in c.hexObjs){
 				Destroy (gObj);
 			}

@@ -401,7 +401,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae03018aecc9c0d47abefdb9321e1bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 32
+  radius: 16
+  startRadius: 4
   numThreads: 1
 --- !u!1 &620707949
 GameObject:

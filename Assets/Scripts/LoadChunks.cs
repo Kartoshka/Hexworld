@@ -8,6 +8,7 @@ public class LoadChunks : AbChunkModifier
 {
     Queue<ChunkManager.Chunk> awaitingInstantiation;
     public int radius;
+	public int startRadius;
     private Coroutine traversal;
 
 	public int numThreads =1;
@@ -25,7 +26,7 @@ public class LoadChunks : AbChunkModifier
         ChunkManager.Chunk c = cManager.getNewChunkData(cManager.findCurrentChunk());
 		cManager.instantiateChunk(c);
 
-        this.verifySurroundings(cManager,4);
+        this.verifySurroundings(cManager, startRadius);
 
 		//How many threads concurrently run and generate chunk data
 		for (int t = 0; t < numThreads; t++) {
