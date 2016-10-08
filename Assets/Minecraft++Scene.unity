@@ -218,7 +218,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cManager: {fileID: 575319496}
   selector: {fileID: 1000010231260202, guid: efe87306ab9404cdeb586b9fa0eb3f56, type: 2}
-  rayCastDistance: 10
+  rayCastDistance: 8
 --- !u!1 &575319493
 GameObject:
   m_ObjectHideFlags: 0
@@ -1029,7 +1029,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecacf5a3fddaa0441ac00c1cbb8a4c4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crosshairTexture: {fileID: 2800000, guid: 801b7a1aa5097487a95997fcaa9c3381, type: 3}
+  crosshairTexture: {fileID: 2800000, guid: 7d365f521fca85747974e402ae69599e, type: 3}
   position:
     serializedVersion: 2
     x: 0
