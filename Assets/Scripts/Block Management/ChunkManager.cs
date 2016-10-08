@@ -277,11 +277,7 @@ public class ChunkManager : MonoBehaviour {
 		c.hexObjs = new List<GameObject>();
 
 		foreach (Block b in c.blocks) {
-			GameObject hObj = addBlock (b, c, true);
-
-			if (hObj != null) {
-				c.hexObjs.Add (hObj);
-			}
+			addBlock (b, c, true);
 		}
 
         chunks.Add(c);
@@ -294,7 +290,11 @@ public class ChunkManager : MonoBehaviour {
 
 	#region ChunkModification
 
-	public GameObject addBlock(Block b, Chunk c, bool deleteOriginal){
+	public bool addBlock(Block b, Chunk c, bool deleteOriginal){
+
+		if(b.pos.y < 0 || b.pos.y + b.vertScale > maxNumBlocks*blockSize){
+			return false;
+		}
 		
 		GameObject hObj = null;
 		GameObject subChunk = null;
@@ -319,11 +319,11 @@ public class ChunkManager : MonoBehaviour {
 
 		if (hObj != null) {
 			//c.hexObjs.Add(hObj);
-			hObj.transform.SetParent(subChunk.transform);
+			hObj.transform.SetParent (subChunk.transform);
 
-			hObj.transform.localScale = new Vector3(1, 1, b.vertScale);
+			hObj.transform.localScale = new Vector3 (1, 1, b.vertScale);
 			hObj.transform.localPosition = b.pos;
-			scaleUV(hObj);
+			scaleUV (hObj);
 
 
 			Mesh finalMesh = new Mesh ();
@@ -340,16 +340,20 @@ public class ChunkManager : MonoBehaviour {
 
 			subChunk.GetComponent<MeshFilter> ().sharedMesh = finalMesh;
 			subChunk.GetComponent<MeshCollider> ().sharedMesh = finalMesh;
+
+			c.hexObjs.Add (hObj);
+		} else {
+			return false;
 		}
 
 
 		if (deleteOriginal) {
 			Destroy (hObj);
-			return null;
 		} else {
 			hObj.SetActive (false);
-			return hObj;
 		}
+
+		return true;
 	}
 
 
