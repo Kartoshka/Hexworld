@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using InventoryManager;
 
 public class PlayerManager : MonoBehaviour {
 
@@ -16,7 +17,7 @@ public class PlayerManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		 
-		Inventory.HexObj selectedItem = inv.getCurrentSelectedItem ();
+		HexObj selectedItem = inv.getSelection ();
 
 		removing = selectedItem.remove;
 
