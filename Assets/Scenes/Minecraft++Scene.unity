@@ -935,10 +935,10 @@ MonoBehaviour:
   - associatedGameObject: {fileID: 0}
     UI_Icon: {fileID: 0}
     add: 0
-    remove: 0
+    remove: 1
   - associatedGameObject: {fileID: 0}
     UI_Icon: {fileID: 0}
-    add: 0
+    add: 1
     remove: 0
   selectedItem: 0
 --- !u!1 &1737253185
