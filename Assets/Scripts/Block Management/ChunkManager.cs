@@ -110,7 +110,6 @@ public class ChunkManager : MonoBehaviour {
 
 
 	void OnApplicationQuit(){
-
 		foreach (Chunk c in loadedChunks.Values) {
 			foreach(GameObject gObj in c.hexObjs){
 				Destroy (gObj);

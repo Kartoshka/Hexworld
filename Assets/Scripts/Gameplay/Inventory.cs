@@ -7,7 +7,7 @@ namespace InventoryManager{
 
 
 		public List<HexObj> itemList;
-		private int selectedItem =0;
+		public int selectedItem =0;
 		
 		// Update is called once per frame
 		void Update () {
@@ -24,9 +24,7 @@ namespace InventoryManager{
 		}
 
 		public void nextItem(){
-			if (selectedItem + 1 < itemList.Count) {
-				selectedItem++;
-			}
+			selectedItem = (selectedItem + 1) % itemList.Count;
 		}
 
 		public void selectItem(int index){
@@ -40,8 +38,8 @@ namespace InventoryManager{
 	[System.Serializable]
 	public struct HexObj{
 		public GameObject associatedGameObject;
-		//Selected will be dependent on object to be added
-		public GameObject associatedshadow;
+
+		public Sprite UI_Icon;
 
 		public bool add;
 

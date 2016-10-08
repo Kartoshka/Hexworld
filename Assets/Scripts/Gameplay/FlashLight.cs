@@ -6,6 +6,7 @@ public class FlashLight : MonoBehaviour {
 
 	bool on = false;
 	bool auto = true;
+	public float IntensityLight =3.5f;
 	// Use this for initialization
 	void Start () {
 		
@@ -43,6 +44,10 @@ public class FlashLight : MonoBehaviour {
 
 		this.GetComponent<Light> ().enabled = on;
 
+		if (on) {
+			this.GetComponent<Light>().intensity=IntensityLight/2f+Mathf.Lerp(IntensityLight-0.1f,IntensityLight+0.1f,Mathf.Cos(Time.time*30));
+		}
+		//light.SetActive(on);
 		
 	}
 }

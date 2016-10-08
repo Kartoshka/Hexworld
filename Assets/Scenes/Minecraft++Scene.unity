@@ -186,7 +186,7 @@ GameObject:
   - component: {fileID: 277399802}
   - component: {fileID: 277399803}
   m_Layer: 0
-  m_Name: Head
+  m_Name: BlockSelector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -829,6 +829,10 @@ Prefab:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
+      propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
   m_IsPrefabParent: 0
@@ -929,11 +933,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemList:
   - associatedGameObject: {fileID: 0}
-    associatedshadow: {fileID: 0}
+    UI_Icon: {fileID: 0}
     add: 0
     remove: 0
   - associatedGameObject: {fileID: 0}
-    associatedshadow: {fileID: 0}
+    UI_Icon: {fileID: 0}
     add: 0
     remove: 0
   selectedItem: 0
@@ -948,7 +952,7 @@ GameObject:
   - component: {fileID: 1737253187}
   - component: {fileID: 1737253188}
   m_Layer: 0
-  m_Name: Spotlight
+  m_Name: FlashLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -973,7 +977,7 @@ Light:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1737253185}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 7
   m_Type: 0
   m_Color: {r: 1, g: 0.7137255, b: 0.28627452, a: 1}
@@ -1012,6 +1016,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c7fa29d3b7b94274bb6d1da96c2e3f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IntensityLight: 2
 --- !u!1 &1771692257 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100002, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}

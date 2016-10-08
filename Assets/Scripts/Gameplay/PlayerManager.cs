@@ -17,6 +17,9 @@ public class PlayerManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		 
+		if (Input.GetButtonDown ("NextItem")) {
+			inv.nextItem ();
+		}
 		HexObj selectedItem = inv.getSelection ();
 
 		removing = selectedItem.remove;
@@ -33,7 +36,6 @@ public class PlayerManager : MonoBehaviour {
 
 		if (bSelector.isBlockSelected()) {
 			if (Input.GetButtonDown ("Fire1")) {
-				Debug.Log ("removed block at position " + bSelector.getSelectedBlock());
 			}
 		}
 		if (Input.GetButtonDown ("Fire2")) {
