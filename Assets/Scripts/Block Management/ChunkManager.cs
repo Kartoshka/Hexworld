@@ -18,6 +18,8 @@ public class ChunkManager : MonoBehaviour {
     public GameObject block_dirt;
     public GameObject block_grass;
 
+	public Material[] blockMaterials;
+
     public AnimationCurve curve;
     public AnimationCurve curve2;
 
@@ -114,8 +116,13 @@ public class ChunkManager : MonoBehaviour {
 			foreach(GameObject gObj in c.hexObjs){
 				Destroy (gObj);
 			}
+			foreach (Transform child in c.mainHolder.transform) {
+				Destroy (child.gameObject);
+			}
+			Destroy (c.mainHolder);
 		}
 	}
+
 	#region ChunkGeneration and Instantiation
     public Chunk getNewChunkData(Vector2 cPos, int size, int maxNumBlocks)
     {
@@ -241,41 +248,41 @@ public class ChunkManager : MonoBehaviour {
 	public Chunk instantiateChunk(Chunk c)
     {
 		
-        GameObject holder = new GameObject("Holder of chunk of size " + size);
-        if (chunks == null)
-        {
+		GameObject holder = new GameObject("Holder of chunk ( " + c.pos.x + " , " + c.pos.z + " ) " + "of size " + size);
+		c.mainHolder = holder;
+
+		GameObject stoneHolder = new GameObject ("StoneHolder");
+		GameObject dirtHolder = new GameObject ("DirtHolder");
+		GameObject grassHolder = new GameObject ("GrassHolder");
+
+		stoneHolder.transform.SetParent (holder.transform);
+		dirtHolder.transform.SetParent (holder.transform);
+		grassHolder.transform.SetParent (holder.transform);
+
+		int t = 0;
+		foreach (Transform child in holder.transform) {
+			child.gameObject.AddComponent<MeshCollider>();
+			MeshFilter filter = child.gameObject.AddComponent<MeshFilter>();
+			filter.sharedMesh = new Mesh ();
+			MeshRenderer renderer = child.gameObject.AddComponent<MeshRenderer>();
+			renderer.material = blockMaterials [t];
+
+			t++;
+		}
+
+        if (chunks == null){
             chunks = new List<Chunk>();
         }
 
 		c.hexObjs = new List<GameObject>();
 
 		foreach (Block b in c.blocks) {
-			GameObject hObj = null;
-			if (b.blockType == (short)BLOCKID.Stone)
-			{
-				hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
-			}
-			else if (b.blockType == (short)BLOCKID.Dirt)
-			{
-				hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
-			}
-			else if (b.blockType == (short)BLOCKID.Grass)
-			{
-				hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
-			}
+			GameObject hObj = addBlock (b, c, true);
 
 			if (hObj != null) {
-				//c.hexObjs.Add(hObj);
-				hObj.transform.SetParent(holder.transform);
-
-				hObj.transform.localScale = new Vector3(1, 1, b.vertScale);
-				hObj.transform.localPosition = b.pos;
-				scaleUV(hObj);
+				c.hexObjs.Add (hObj);
 			}
 		}
-		c.hexObjs.Add (holder);
-		//Combine meshes
-		combineBlockMeshes(holder);
 
         chunks.Add(c);
         loadedChunks.Add(c.pos, c);
@@ -285,92 +292,71 @@ public class ChunkManager : MonoBehaviour {
 
 	#endregion
 
-	#region MeshCombination
-	//Combine a bunch of block meshes into one mesh
-	public void combineBlockMeshes(GameObject parent)
-	{
-        MeshCollider collider = parent.AddComponent<MeshCollider>();
-		parent.AddComponent<MeshFilter>();
-		parent.AddComponent<MeshRenderer>();
+	#region ChunkModification
 
-		MeshFilter[]  filters = parent.GetComponentsInChildren<MeshFilter>();
-		List<Material> materials = new List<Material> ();
-		MeshRenderer[] renderers = parent.GetComponentsInChildren<MeshRenderer> (false);
+	public GameObject addBlock(Block b, Chunk c, bool deleteOriginal){
+		
+		GameObject hObj = null;
+		GameObject subChunk = null;
 
-
-
-		foreach (MeshRenderer renderer in renderers) {
-			if (renderer.transform == parent.transform)
-				continue;
-			Material[] localMats = renderer.sharedMaterials;
-			foreach (Material localMat in localMats) {
-				if (!materials.Contains (localMat))
-					materials.Add (localMat);
-			}
+		if (b.blockType == (short)BLOCKID.Stone)
+		{
+			hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
+			subChunk = c.mainHolder.transform.FindChild("StoneHolder").gameObject;
+		}
+		else if (b.blockType == (short)BLOCKID.Dirt)
+		{
+			hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
+			subChunk = c.mainHolder.transform.FindChild("DirtHolder").gameObject;
+		}
+		else if (b.blockType == (short)BLOCKID.Grass)
+		{
+			hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
+			subChunk = c.mainHolder.transform.FindChild("GrassHolder").gameObject;
 		}
 
-		parent.GetComponent<MeshRenderer> ().materials = materials.ToArray();
+		GameObject[] twoObjects = {hObj, subChunk};
 
-		List<Mesh> submeshes = new List<Mesh> ();
+		if (hObj != null) {
+			//c.hexObjs.Add(hObj);
+			hObj.transform.SetParent(subChunk.transform);
 
-		foreach (Material material in materials) {
-			
-			List<CombineInstance> combiners = new List<CombineInstance> ();
+			hObj.transform.localScale = new Vector3(1, 1, b.vertScale);
+			hObj.transform.localPosition = b.pos;
+			scaleUV(hObj);
 
-			foreach (MeshFilter filter in filters) {
-				
-				MeshRenderer renderer = filter.GetComponent<MeshRenderer> ();
-				if (renderer == null)
-					continue;
 
-				Material[] localMaterials = renderer.sharedMaterials;
-				for (int materialIndex = 0; materialIndex < localMaterials.Length; materialIndex++) {
-					if (localMaterials [materialIndex] != material)
-						continue;
+			Mesh finalMesh = new Mesh ();
 
-					CombineInstance ci = new CombineInstance ();
-					ci.mesh = filter.sharedMesh;
-					ci.subMeshIndex = materialIndex;
-					ci.transform = filter.transform.localToWorldMatrix;
-					combiners.Add (ci);
-				}
+			CombineInstance[] combiners = new CombineInstance[2];
+
+			for (int i = 0; i < 2; i++) {
+				combiners [i].subMeshIndex = 0;
+				combiners [i].mesh = twoObjects [i].GetComponent<MeshFilter> ().sharedMesh;
+				combiners [i].transform = twoObjects [i].GetComponent<MeshFilter> ().transform.localToWorldMatrix;
 			}
 
-			Mesh mesh = new Mesh ();
-			mesh.CombineMeshes (combiners.ToArray(), true);
-			submeshes.Add (mesh);
+			finalMesh.CombineMeshes (combiners);
+
+			subChunk.GetComponent<MeshFilter> ().sharedMesh = finalMesh;
+			subChunk.GetComponent<MeshCollider> ().sharedMesh = finalMesh;
 		}
 
-		List<CombineInstance> finalCombiners = new List<CombineInstance> ();
-		foreach (Mesh mesh in submeshes) {
-			CombineInstance ci = new CombineInstance ();
-			ci.mesh = mesh;
-			ci.subMeshIndex = 0;
-			ci.transform = Matrix4x4.identity;
-			finalCombiners.Add (ci);
+
+		if (deleteOriginal) {
+			Destroy (hObj);
+			return null;
+		} else {
+			hObj.SetActive (false);
+			return hObj;
 		}
-
-		Mesh finalMesh = new Mesh ();
-		finalMesh.CombineMeshes (finalCombiners.ToArray(), false);
-		parent.GetComponent<MeshFilter> ().sharedMesh = finalMesh;
-
-        Transform[] children = parent.GetComponentsInChildren<Transform>();
-        //for (int a = 0; a < parent.transform.childCount; a++) {
-        //	//parent.transform.GetChild (a).gameObject.GetComponent<MeshRenderer> ().enabled = false;
-        //          parent.transform.GetChild(a)
-        //}
-
-        foreach (Transform t in children)
-        {
-            if (t != parent.transform)
-            {
-                Destroy(t.gameObject);
-            }
-        }
-
-        collider.sharedMesh = finalMesh;
 	}
 
+
+	#endregion
+
+
+	#region UVScaling
     //Scale the UV coordinates of a block's mesh
     private void scaleUV(GameObject obj)
     {
@@ -426,6 +412,10 @@ public class ChunkManager : MonoBehaviour {
                     Destroy(obj);
                 }
             }
+			foreach (Transform child in c.mainHolder.transform) {
+				Destroy (child.gameObject);
+			}
+			Destroy (c.mainHolder);
         }
         return loadedChunks.Remove(pos);
     }
@@ -463,6 +453,7 @@ public class ChunkManager : MonoBehaviour {
     {
         public int size;
         public Vector3 pos;
+		public GameObject mainHolder;
         public List<GameObject> hexObjs;
         public short[,,] blockTypes;
 		public List<Block> blocks;
