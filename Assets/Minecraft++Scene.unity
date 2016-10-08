@@ -213,12 +213,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 277399801}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93b570e8b135b46cb83b75105674ef1e, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ef9bfba99e9449cd89de0f2e9fd8161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cManager: {fileID: 575319496}
   selector: {fileID: 1000010231260202, guid: efe87306ab9404cdeb586b9fa0eb3f56, type: 2}
   rayCastDistance: 8
+  normalOffsetDistance: 0.2
 --- !u!1 &575319493
 GameObject:
   m_ObjectHideFlags: 0
@@ -900,6 +901,42 @@ Prefab:
 GameObject:
   m_PrefabParentObject: {fileID: 100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
   m_PrefabInternal: {fileID: 1153822875}
+--- !u!114 &1597006541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1597006540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 910b3ea92db724d8aa5269b9156a9ffe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cManager: {fileID: 575319496}
+  inv: {fileID: 1597006546}
+  bSelector: {fileID: 277399803}
+  removing: 1
+--- !u!114 &1597006546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1597006540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75432113f058a40a1a3cdee58feb00d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemList:
+  - associatedGameObject: {fileID: 0}
+    associatedshadow: {fileID: 0}
+    add: 0
+    remove: 0
+  - associatedGameObject: {fileID: 0}
+    associatedshadow: {fileID: 0}
+    add: 0
+    remove: 0
+  selectedItem: 0
 --- !u!1 &1737253185
 GameObject:
   m_ObjectHideFlags: 0
