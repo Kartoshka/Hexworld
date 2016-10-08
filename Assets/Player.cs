@@ -35,9 +35,12 @@ public class Player : MonoBehaviour {
 					this.hit = position;
 					float y = Mathf.Floor (position.y / cManager.blockSize) * cManager.blockSize;
 
-					float z = Mathf.Floor (position.z / 1.5f) *1.5f;
+					int zRound = Mathf.FloorToInt ((position.z + 1) / 1.5f);
+
+					//float z = Mathf.Floor ((position.z+1) / 1.5f) *1.5f;
+					float z = (float)zRound * 1.5f;
 						
-					float x = Mathf.Floor(position.x / (2 * 0.866f))*2f*0.866f - (Mathf.FloorToInt (position.z / 1.5f)%2)*0.866f;
+					float x = Mathf.Floor ((position.x + 0.866f + (zRound % 2)*0.866f) / (2 * 0.866f)) * 2f * 0.866f - (zRound % 2)*0.866f;
 						
 					selector.transform.position = new Vector3 (x, y, z);
 					}
