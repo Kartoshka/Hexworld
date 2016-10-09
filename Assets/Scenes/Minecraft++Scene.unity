@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae03018aecc9c0d47abefdb9321e1bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 12
+  radius: 16
   startRadius: 8
   numThreads: 1
 --- !u!4 &26337148
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d277adbb36be64eafacbcb23ed310b7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unloadPastDistance: 15
+  unloadPastDistance: 24
 --- !u!4 &203889928
 Transform:
   m_ObjectHideFlags: 0
@@ -937,18 +937,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemList:
   - blockId: 2
-    vertScale: 0.25
-    numItems: 10
+    stack: 1
+    numItems: 1000
     add: 1
     remove: 0
   - blockId: 3
-    vertScale: 0.25
-    numItems: 0
+    stack: 1
+    numItems: 1000
     add: 1
     remove: 0
   - blockId: 1
-    vertScale: 0.25
-    numItems: 0
+    stack: 1
+    numItems: 1000
     add: 1
     remove: 0
   selectedItem: 0
