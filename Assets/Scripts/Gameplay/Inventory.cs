@@ -48,5 +48,7 @@ namespace InventoryManager{
 		public bool add;
 
 		public bool remove;
+
+
 	}
 }

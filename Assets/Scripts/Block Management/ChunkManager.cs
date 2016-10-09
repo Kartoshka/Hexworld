@@ -413,16 +413,25 @@ public class ChunkManager : MonoBehaviour {
             {
                 foreach(GameObject obj in c.hexObjs)
                 {
+					MeshFilter filter = obj.GetComponent<MeshFilter> ();
+					if (filter != null) {
+						Destroy (filter.sharedMesh);
+					}
                     Destroy(obj);
                 }
             }
 			foreach (Transform child in c.mainHolder.transform) {
+				MeshFilter filter = child.GetComponent<MeshFilter> ();
+				if (filter != null) {
+					Destroy (filter.sharedMesh);
+				}
 				Destroy (child.gameObject);
 			}
 			Destroy (c.mainHolder);
         }
         return loadedChunks.Remove(pos);
     }
+
 
     public Chunk getLoadedChunk(Vector2 cpos)
     {
