@@ -67,29 +67,33 @@ public class LoadChunks : AbChunkModifier
     {
 		
 			int startFrame = Environment.TickCount;
+
 			if (awaitingInstantiation == null) {
 				return;
-				//yield return null;
 			} else {
 				int timeTaken = 0;
 				while (awaitingInstantiation.Count > 0) {
 				
 					ChunkManager.Chunk c = awaitingInstantiation.Dequeue ();
 					//cManager.instantiateChunk(c.pos, c.size, 512, c.blockTypes);
+
 					cManager.instantiateChunk (c);
+
 					int instantiationTime = (Environment.TickCount - startFrame);
-					startFrame = Environment.TickCount;
+
+
 					timeTaken += instantiationTime;
+
 					if (timeTaken > 16.67) {
 						break;
 					} else if ((timeTaken + instantiationTime) > 16.67) {
 						break;
 					}
+					startFrame = Environment.TickCount;
 				}
 			}
 			traversal = null;
 
-        //yield return null;
     }
 
 	/// <summary>

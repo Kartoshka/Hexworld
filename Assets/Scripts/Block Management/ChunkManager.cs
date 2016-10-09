@@ -106,7 +106,7 @@ public class ChunkManager : MonoBehaviour {
 
         if(moved)
         {
-									//This line is to commemorate Eeloo
+			//This line is to commemorate Eeloo
             currentChunkPos = pos;
         }
 
@@ -342,8 +342,6 @@ public class ChunkManager : MonoBehaviour {
 			subChunk = c.mainHolder.transform.FindChild("GrassHolder").gameObject;
 		}
 
-		GameObject[] twoObjects = {hObj, subChunk};
-
 		Mesh[] twoMeshes = { hMesh, subChunk.GetComponent<MeshFilter> ().sharedMesh };
 
 		if (hMesh != null) {
@@ -379,45 +377,13 @@ public class ChunkManager : MonoBehaviour {
 			return false;
 		}
 
-//		if (hObj != null) {
-//			//c.hexObjs.Add(hObj);
-//			hObj.transform.SetParent (subChunk.transform);
-//
-//			hObj.transform.localScale = new Vector3 (1, 1, b.vertScale);
-//			hObj.transform.localPosition = b.pos;
-//			scaleUV (hObj);
-//
-//
-//			Mesh finalMesh = new Mesh ();
-//
-//			CombineInstance[] combiners = new CombineInstance[2];
-//
-//			for (int i = 0; i < 2; i++) {
-//				combiners [i].subMeshIndex = 0;
-//				combiners [i].mesh = twoObjects [i].GetComponent<MeshFilter> ().sharedMesh;
-//				combiners [i].transform = twoObjects [i].GetComponent<MeshFilter> ().transform.localToWorldMatrix;
-//			}
-//
-//			finalMesh.CombineMeshes (combiners);
-//
-//			subChunk.GetComponent<MeshFilter> ().sharedMesh = finalMesh;
-//			subChunk.GetComponent<MeshCollider> ().sharedMesh = finalMesh;
-//
-//			c.hexObjs.Add (hObj);
-//		} else {
-//			return false;
-//		}
-
 		this.gameObject.transform.localScale = originalScale;
 		this.gameObject.transform.position = originalPos;
 		this.gameObject.transform.rotation = originalRotation;
 		this.gameObject.transform.SetParent (originalParent);
+
 		if (deleteOriginal) {
 			Destroy (hMesh);
-			//Destroy (transform);
-			//Destroy (hObj.GetComponent<MeshFilter> ().sharedMesh);
-			//Destroy (hObj);
-
 		} else {
 			hObj.SetActive (false);
 		}
@@ -459,6 +425,7 @@ public class ChunkManager : MonoBehaviour {
 
     }
 
+	//Scale UV coordinates of a mesh instead of a gameobject, used for more optimied chunk generation
 	private void scaleUV(Mesh mesh,Vector3 localScale){
 		Vector3[] vertices = mesh.vertices;
 		Vector2[] uvs = new Vector2[vertices.Length];
