@@ -315,7 +315,8 @@ public class ChunkManager : MonoBehaviour {
 		
 		GameObject hObj = null;
 		Mesh hMesh =null;
-		Transform transform = null;
+        Mesh finalMesh;
+        Transform transform = null;
 		GameObject subChunk = null;
 
 		if (b.blockType == (short)BLOCKID.Stone)
@@ -356,7 +357,7 @@ public class ChunkManager : MonoBehaviour {
 			scaleUV (hMesh, transform.localScale);
 
 
-			Mesh finalMesh = new Mesh ();
+			finalMesh = new Mesh ();
 			Transform[] transforms = { transform, subChunk.transform };
 
 			CombineInstance[] combiners = new CombineInstance[2];
@@ -475,9 +476,11 @@ public class ChunkManager : MonoBehaviour {
 					if (obj != null) {
 						MeshFilter filter = obj.GetComponent<MeshFilter> ();
 						if (filter != null) {
-							Destroy (filter.sharedMesh);
-						}
-						Destroy (obj);
+							Destroy (filter.mesh);
+                            Destroy(filter.sharedMesh);
+                            Destroy(filter);
+                        }
+                        Destroy (obj);
 					}
                 }
             }
