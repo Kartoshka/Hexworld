@@ -413,26 +413,26 @@ public class ChunkManager : MonoBehaviour {
             {
                 foreach(GameObject obj in c.hexObjs)
                 {
-					MeshFilter filter = obj.GetComponent<MeshFilter> ();
-					if (filter != null) {
-						Destroy (filter.sharedMesh);
-					}
-					MeshCollider collider = obj.GetComponent<MeshCollider> ();
-					if (collider != null) {
-						Destroy (collider.sharedMesh);
-					}
+//					MeshFilter filter = obj.GetComponent<MeshFilter> ();
+//					if (filter != null) {
+//						Destroy (filter.sharedMesh);
+//					}
+//					MeshCollider collider = obj.GetComponent<MeshCollider> ();
+//					if (collider != null) {
+//						Destroy (collider.sharedMesh);
+//					}
                     Destroy(obj);
                 }
             }
 			foreach (Transform child in c.mainHolder.transform) {
-				MeshFilter filter = child.GetComponent<MeshFilter> ();
-				if (filter != null) {
-					Destroy (filter.sharedMesh);
-				}
-				MeshCollider collider = child.GetComponent<MeshCollider> ();
-				if (collider != null) {
-					Destroy (collider.sharedMesh);
-				}
+//				MeshFilter filter = child.GetComponent<MeshFilter> ();
+//				if (filter != null) {
+//					Destroy (filter.sharedMesh);
+//				}
+//				MeshCollider collider = child.GetComponent<MeshCollider> ();
+//				if (collider != null) {
+//					Destroy (collider.sharedMesh);
+//				}
 				Destroy (child.gameObject);
 			}
 			Destroy (c.mainHolder);
