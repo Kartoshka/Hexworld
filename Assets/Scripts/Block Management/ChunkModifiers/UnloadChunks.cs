@@ -23,6 +23,8 @@ public class UnloadChunks : AbChunkModifier {
 				cManager.DestroyChunk (c.pos);
 			}
 		}
+
+		Resources.UnloadUnusedAssets ();
 	}
 
 	public override void OnChunkManagerUpdate (ChunkManager cManager)

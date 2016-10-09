@@ -417,6 +417,10 @@ public class ChunkManager : MonoBehaviour {
 					if (filter != null) {
 						Destroy (filter.sharedMesh);
 					}
+					MeshCollider collider = obj.GetComponent<MeshCollider> ();
+					if (collider != null) {
+						Destroy (collider.sharedMesh);
+					}
                     Destroy(obj);
                 }
             }
@@ -424,6 +428,10 @@ public class ChunkManager : MonoBehaviour {
 				MeshFilter filter = child.GetComponent<MeshFilter> ();
 				if (filter != null) {
 					Destroy (filter.sharedMesh);
+				}
+				MeshCollider collider = child.GetComponent<MeshCollider> ();
+				if (collider != null) {
+					Destroy (collider.sharedMesh);
 				}
 				Destroy (child.gameObject);
 			}
