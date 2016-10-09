@@ -33,6 +33,7 @@ public class LoadChunks : AbChunkModifier
 			this.StartCoroutineAsync (continuousGenThread (cManager));
 		}
 
+		//traversal = StartCoroutine (TraverseList (cManager));
     }
     public override void OnMoveChunks(ChunkManager cManager)
     {
@@ -43,14 +44,16 @@ public class LoadChunks : AbChunkModifier
     {
         if (awaitingInstantiation.Count > 0)
         {
-            traversal = StartCoroutine(TraverseList(cManager));
+            TraverseList(cManager);
         }
     }
 
 	public void OnApplicationQuit()
 	{
 		run = false;
-		StopCoroutine (traversal);
+		if (traversal != null) {
+			StopCoroutine (traversal);
+		}
 	}
 
 	#endregion
@@ -60,34 +63,33 @@ public class LoadChunks : AbChunkModifier
 	/// </summary>
 	/// <returns>The list.</returns>
 	/// <param name="cManager">C manager.</param>
-    private IEnumerator TraverseList(ChunkManager cManager)
+    private void TraverseList(ChunkManager cManager)
     {
-		int startFrame = Environment.TickCount;
-        if (awaitingInstantiation == null)
-        {
-            yield return null;
-        }
-        else
-        {
-			int timeTaken = 0;
-            while (awaitingInstantiation.Count > 0)
-            {
+		
+			int startFrame = Environment.TickCount;
+			if (awaitingInstantiation == null) {
+				return;
+				//yield return null;
+			} else {
+				int timeTaken = 0;
+				while (awaitingInstantiation.Count > 0) {
 				
-                ChunkManager.Chunk c = awaitingInstantiation.Dequeue();
-                //cManager.instantiateChunk(c.pos, c.size, 512, c.blockTypes);
-				cManager.instantiateChunk(c);
-				int instantiationTime = (Environment.TickCount - startFrame);
-				startFrame = Environment.TickCount;
-				timeTaken += instantiationTime;
-				if (timeTaken > 16.67) {
-					break;
-				} else if ((timeTaken + instantiationTime) > 16.67) {
-					break;
+					ChunkManager.Chunk c = awaitingInstantiation.Dequeue ();
+					//cManager.instantiateChunk(c.pos, c.size, 512, c.blockTypes);
+					cManager.instantiateChunk (c);
+					int instantiationTime = (Environment.TickCount - startFrame);
+					startFrame = Environment.TickCount;
+					timeTaken += instantiationTime;
+					if (timeTaken > 16.67) {
+						break;
+					} else if ((timeTaken + instantiationTime) > 16.67) {
+						break;
+					}
 				}
-            }
-        }
-        traversal = null;
-        yield return null;
+			}
+			traversal = null;
+
+        //yield return null;
     }
 
 	/// <summary>
