@@ -6,6 +6,8 @@ public class UnloadChunks : AbChunkModifier {
 
 	public int unloadPastDistance = 1;
 
+	public float delayToUnloadAssets =2;
+	private float lastTimeUnloadAssets = 0;
 	public override void OnChunkManagerStart (ChunkManager cManager)
 	{
 
@@ -25,11 +27,16 @@ public class UnloadChunks : AbChunkModifier {
 		}
 
 		Resources.UnloadUnusedAssets ();
+		lastTimeUnloadAssets = Time.time;
 	}
 
 	public override void OnChunkManagerUpdate (ChunkManager cManager)
 	{
 
+		if ((Time.time - lastTimeUnloadAssets) >= delayToUnloadAssets) {
+			Resources.UnloadUnusedAssets ();
+			lastTimeUnloadAssets = Time.time;
+		}
 	}
 		
 

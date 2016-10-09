@@ -348,7 +348,9 @@ public class ChunkManager : MonoBehaviour {
 
 
 		if (deleteOriginal) {
+			Destroy (hObj.GetComponent<MeshFilter> ().sharedMesh);
 			Destroy (hObj);
+
 		} else {
 			hObj.SetActive (false);
 		}
@@ -413,25 +415,19 @@ public class ChunkManager : MonoBehaviour {
             {
                 foreach(GameObject obj in c.hexObjs)
                 {
-					MeshFilter filter = obj.GetComponent<MeshFilter> ();
-					if (filter != null) {
-						Destroy (filter.sharedMesh);
+					if (obj != null) {
+						MeshFilter filter = obj.GetComponent<MeshFilter> ();
+						if (filter != null) {
+							Destroy (filter.sharedMesh);
+						}
+						Destroy (obj);
 					}
-					MeshCollider collider = obj.GetComponent<MeshCollider> ();
-					if (collider != null) {
-						Destroy (collider.sharedMesh);
-					}
-                    Destroy(obj);
                 }
             }
 			foreach (Transform child in c.mainHolder.transform) {
 				MeshFilter filter = child.GetComponent<MeshFilter> ();
 				if (filter != null) {
 					Destroy (filter.sharedMesh);
-				}
-				MeshCollider collider = child.GetComponent<MeshCollider> ();
-				if (collider != null) {
-					Destroy (collider.sharedMesh);
 				}
 				Destroy (child.gameObject);
 			}
