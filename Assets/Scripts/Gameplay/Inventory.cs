@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Consts;
 
 namespace InventoryManager{
 	public class Inventory : MonoBehaviour {
@@ -37,9 +38,12 @@ namespace InventoryManager{
 
 	[System.Serializable]
 	public struct HexObj{
-		public GameObject associatedGameObject;
+		public BLOCKID blockId;
 
-		public Sprite UI_Icon;
+		public int stack;
+
+		public int numItems;
+
 
 		public bool add;
 

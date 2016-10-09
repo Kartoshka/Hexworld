@@ -936,12 +936,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemList:
-  - associatedGameObject: {fileID: 0}
-    UI_Icon: {fileID: 0}
-    add: 0
-    remove: 1
-  - associatedGameObject: {fileID: 0}
-    UI_Icon: {fileID: 0}
+  - blockId: 2
+    vertScale: 0.25
+    numItems: 10
+    add: 1
+    remove: 0
+  - blockId: 3
+    vertScale: 0.25
+    numItems: 0
+    add: 1
+    remove: 0
+  - blockId: 1
+    vertScale: 0.25
+    numItems: 0
     add: 1
     remove: 0
   selectedItem: 0

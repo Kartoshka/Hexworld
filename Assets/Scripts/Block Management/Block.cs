@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Block {
+public class Block:MonoBehaviour {
 
 
     public Vector3 pos;

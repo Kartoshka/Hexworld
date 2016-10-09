@@ -450,6 +450,23 @@ public class ChunkManager : MonoBehaviour {
         return new Vector2(x, z);
     }
 
+
+	public Chunk getChunkAtPos(Vector3 position){
+
+		int x = Mathf.FloorToInt(position.x / ((float)size * xDistanceBlocks));
+		int z = Mathf.FloorToInt(position.z / ((float)size * zDistanceBlocks));
+
+		Chunk result;
+		bool success = loadedChunks.TryGetValue (new Vector2 (x, z), out result);
+
+		if (!success) {
+			new UnityException ("Chunk not laoded, cannot retrieve");
+		}
+
+		return result;
+		//First snap position to grid
+
+	}
 	#endregion
 
     [System.Serializable]
