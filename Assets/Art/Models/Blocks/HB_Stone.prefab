@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4000010287829614}
   - component: {fileID: 33000010101106810}
   - component: {fileID: 23000013841851238}
-  - component: {fileID: 64000010580748240}
   m_Layer: 0
   m_Name: HB_Stone
   m_TagString: Untagged
@@ -79,18 +78,4 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000012078384566}
-  m_Mesh: {fileID: 4300000, guid: 6cdeca1cdf400e843a1b9e0853494b7f, type: 3}
---- !u!64 &64000010580748240
-MeshCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012078384566}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Convex: 0
-  m_InflateMesh: 0
-  m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 6cdeca1cdf400e843a1b9e0853494b7f, type: 3}

@@ -6,6 +6,11 @@ using NoiseTest;
 
 public class ChunkManager : MonoBehaviour {
 
+	private Vector3 originalPos;
+	private Vector3 originalScale;
+	private Quaternion originalRotation;
+	private Transform originalParent;
+
     //Along x axis
     private float xDistanceBlocks = 0.866f * 2f;
     //Along z axis, distance between blocks
@@ -64,6 +69,12 @@ public class ChunkManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+
+		originalPos = this.transform.position;
+		originalScale = this.transform.localScale;
+		originalRotation = this.transform.rotation;
+		originalParent = this.transform.parent;
+
 		noise = new OpenSimplexNoise[octaveZoom.Length];
 		for(int n=0;n<noise.Length;n++){
 			noise[n] = new OpenSimplexNoise (octaveSeeds[n]*gameSeed);
@@ -277,8 +288,14 @@ public class ChunkManager : MonoBehaviour {
 		c.hexObjs = new List<GameObject>();
 
 		foreach (Block b in c.blocks) {
-			addBlock (b, c, true);
+			addBlock (b, c, true,false);
 		}
+
+		//Update the colliders. In reality we want to do this a little as possible because we're using meshcolliders and those do not like being changed.
+		stoneHolder.GetComponent<MeshCollider> ().sharedMesh = stoneHolder.GetComponent<MeshFilter> ().sharedMesh;
+		grassHolder.GetComponent<MeshCollider> ().sharedMesh = grassHolder.GetComponent<MeshFilter> ().sharedMesh;
+		dirtHolder.GetComponent<MeshCollider> ().sharedMesh = dirtHolder.GetComponent<MeshFilter> ().sharedMesh;
+
 
         chunks.Add(c);
         loadedChunks.Add(c.pos, c);
@@ -290,66 +307,116 @@ public class ChunkManager : MonoBehaviour {
 
 	#region ChunkModification
 
-	public bool addBlock(Block b, Chunk c, bool deleteOriginal){
+	public bool addBlock(Block b, Chunk c, bool deleteOriginal,bool updateCollider){
 
 		if(b.pos.y < 0 || b.pos.y + b.vertScale > maxNumBlocks*blockSize){
 			return false;
 		}
 		
 		GameObject hObj = null;
+		Mesh hMesh =null;
+		Transform transform = null;
 		GameObject subChunk = null;
 
 		if (b.blockType == (short)BLOCKID.Stone)
 		{
-			hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
+			//hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
+			hObj = block_stone;
+			hMesh = (Mesh)Instantiate (block_stone.GetComponent<MeshFilter> ().sharedMesh);
 			subChunk = c.mainHolder.transform.FindChild("StoneHolder").gameObject;
 		}
 		else if (b.blockType == (short)BLOCKID.Dirt)
 		{
-			hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
+			//hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
+			hObj = block_dirt;
+			hMesh = (Mesh)Instantiate (block_dirt.GetComponent<MeshFilter> ().sharedMesh);
+
 			subChunk = c.mainHolder.transform.FindChild("DirtHolder").gameObject;
 		}
 		else if (b.blockType == (short)BLOCKID.Grass)
 		{
-			hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
+			//hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
+			hObj = block_grass;
+			hMesh = (Mesh)Instantiate (block_grass.GetComponent<MeshFilter> ().sharedMesh);
+
 			subChunk = c.mainHolder.transform.FindChild("GrassHolder").gameObject;
 		}
 
 		GameObject[] twoObjects = {hObj, subChunk};
 
-		if (hObj != null) {
-			//c.hexObjs.Add(hObj);
-			hObj.transform.SetParent (subChunk.transform);
+		Mesh[] twoMeshes = { hMesh, subChunk.GetComponent<MeshFilter> ().sharedMesh };
 
-			hObj.transform.localScale = new Vector3 (1, 1, b.vertScale);
-			hObj.transform.localPosition = b.pos;
-			scaleUV (hObj);
+		if (hMesh != null) {
+			
+			transform = this.gameObject.transform;
+
+			transform.rotation = hObj.transform.rotation;
+
+			transform.parent = subChunk.transform;
+			transform.localScale = new Vector3 (1, 1, b.vertScale);
+			transform.localPosition = b.pos;
+			scaleUV (hMesh, transform.localScale);
 
 
 			Mesh finalMesh = new Mesh ();
+			Transform[] transforms = { transform, subChunk.transform };
 
 			CombineInstance[] combiners = new CombineInstance[2];
 
 			for (int i = 0; i < 2; i++) {
 				combiners [i].subMeshIndex = 0;
-				combiners [i].mesh = twoObjects [i].GetComponent<MeshFilter> ().sharedMesh;
-				combiners [i].transform = twoObjects [i].GetComponent<MeshFilter> ().transform.localToWorldMatrix;
+				combiners [i].mesh = twoMeshes [i];
+				combiners [i].transform = transforms [i].localToWorldMatrix;
 			}
 
 			finalMesh.CombineMeshes (combiners);
 
 			subChunk.GetComponent<MeshFilter> ().sharedMesh = finalMesh;
-			subChunk.GetComponent<MeshCollider> ().sharedMesh = finalMesh;
-
-			c.hexObjs.Add (hObj);
+			if (updateCollider) {
+				subChunk.GetComponent<MeshCollider> ().sharedMesh = finalMesh;
+			}
 		} else {
 			return false;
 		}
 
+//		if (hObj != null) {
+//			//c.hexObjs.Add(hObj);
+//			hObj.transform.SetParent (subChunk.transform);
+//
+//			hObj.transform.localScale = new Vector3 (1, 1, b.vertScale);
+//			hObj.transform.localPosition = b.pos;
+//			scaleUV (hObj);
+//
+//
+//			Mesh finalMesh = new Mesh ();
+//
+//			CombineInstance[] combiners = new CombineInstance[2];
+//
+//			for (int i = 0; i < 2; i++) {
+//				combiners [i].subMeshIndex = 0;
+//				combiners [i].mesh = twoObjects [i].GetComponent<MeshFilter> ().sharedMesh;
+//				combiners [i].transform = twoObjects [i].GetComponent<MeshFilter> ().transform.localToWorldMatrix;
+//			}
+//
+//			finalMesh.CombineMeshes (combiners);
+//
+//			subChunk.GetComponent<MeshFilter> ().sharedMesh = finalMesh;
+//			subChunk.GetComponent<MeshCollider> ().sharedMesh = finalMesh;
+//
+//			c.hexObjs.Add (hObj);
+//		} else {
+//			return false;
+//		}
 
+		this.gameObject.transform.localScale = originalScale;
+		this.gameObject.transform.position = originalPos;
+		this.gameObject.transform.rotation = originalRotation;
+		this.gameObject.transform.SetParent (originalParent);
 		if (deleteOriginal) {
-			Destroy (hObj.GetComponent<MeshFilter> ().sharedMesh);
-			Destroy (hObj);
+			Destroy (hMesh);
+			//Destroy (transform);
+			//Destroy (hObj.GetComponent<MeshFilter> ().sharedMesh);
+			//Destroy (hObj);
 
 		} else {
 			hObj.SetActive (false);
@@ -391,6 +458,29 @@ public class ChunkManager : MonoBehaviour {
         mesh.uv = uvs;
 
     }
+
+	private void scaleUV(Mesh mesh,Vector3 localScale){
+		Vector3[] vertices = mesh.vertices;
+		Vector2[] uvs = new Vector2[vertices.Length];
+
+		//Debug.Log("--Next Mesh--");
+
+		for (int i = 0; i < uvs.Length; i++)
+		{
+			uvs[i][0] = mesh.uv[i][0];
+
+			if (mesh.uv[i][1] == 0.5)
+			{
+				uvs[i][1] = 0.5f * localScale[2];
+			}
+			else
+			{
+				uvs[i][1] = mesh.uv[i][1];
+			}
+		}
+
+		mesh.uv = uvs;
+	}
 
 	#endregion
 
