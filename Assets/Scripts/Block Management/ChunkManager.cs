@@ -288,7 +288,7 @@ public class ChunkManager : MonoBehaviour {
 		c.hexObjs = new List<GameObject>();
 
 		foreach (Block b in c.blocks) {
-			addBlock (b, c, true,false);
+			addBlockToMesh (b, c, true,false);
 		}
 
 		//Update the colliders. In reality we want to do this a little as possible because we're using meshcolliders and those do not like being changed.
@@ -307,12 +307,12 @@ public class ChunkManager : MonoBehaviour {
 
 	#region ChunkModification
 
-	public bool addBlock(Block b, Chunk c, bool deleteOriginal,bool updateCollider){
+	private bool addBlockToMesh(Block b, Chunk c, bool deleteOriginal,bool updateCollider){
 
 		if(b.pos.y < 0 || b.pos.y + b.vertScale > maxNumBlocks*blockSize){
 			return false;
 		}
-		
+
 		GameObject hObj = null;
 		Mesh hMesh =null;
         Mesh finalMesh;
@@ -388,9 +388,33 @@ public class ChunkManager : MonoBehaviour {
         } else {
 			hObj.SetActive (false);
 		}
-
 		return true;
 	}
+
+	public bool AddBlock(Block b, Chunk c, bool deleteOriginal,bool updateCollider){
+		Vector3 localCoords = getLocalBlockCoords (b.pos);
+		Chunk chun;
+
+		try {
+			chun = getChunkAtPos (b.pos);
+		} catch (System.Exception ex) {
+			return false;
+		}
+
+		if (chun.blockTypes [(int)localCoords.x, (int)localCoords.z, (int)localCoords.y] == (short)b.blockType) {
+			return true;
+		} else {
+			if(addBlockToMesh(b,c,deleteOriginal,updateCollider)){
+				chun.blockTypes [(int)localCoords.x, (int)localCoords.z, (int)localCoords.y] = (short)b.blockType;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
 
 
 	#endregion
@@ -546,7 +570,7 @@ public class ChunkManager : MonoBehaviour {
         ChunkManager.Chunk chun = this.getChunkAtPos(pos);
 
         int x = (int)(ar[0] - chun.pos.x * this.size);
-        int y = (int)ar[1]+1;
+        int y = (int)ar[1] +2;
         int z = (int)(ar[2] - chun.pos.y * this.size);
 
         if (x >= size)
@@ -558,26 +582,19 @@ public class ChunkManager : MonoBehaviour {
         {
            z = (int)(ar[2] - (chun.pos.y + 1) * this.size);
         }
-        short result = chun.blockTypes[x, z, y];
-        if (result == (short)BLOCKID.Air)
-        {
-            Debug.Log("air");
-        }
-        else if (result == (short)BLOCKID.Dirt)
-        {
-            Debug.Log("dirt");
-        }
-        else if (result == (short)BLOCKID.Stone)
-        {
-            Debug.Log("stone");
-        }
-        else if (result == (short)BLOCKID.Grass)
-        {
-            Debug.Log("grass");
-        }
-        Debug.Log(" at " + x + "," + y + "," + z +" chunk is "+chun.pos);
         return chun.blockTypes[x,z,y];
     }
+
+	public Vector3 getLocalBlockCoords(Vector3 pos){
+		int[] ar = (getGlobalBlockCoords(pos));
+		ChunkManager.Chunk chun = this.getChunkAtPos(pos);
+
+		int x = (int)(ar[0] - chun.pos.x * this.size);
+		int y = (int)ar[1] +2;
+		int z = (int)(ar[2] - chun.pos.y * this.size);
+
+		return new Vector3 (x, y, z);
+	}
 
     public Vector3 snapCoordsToGrid(Vector3 position)
     {
@@ -622,6 +639,7 @@ public class ChunkManager : MonoBehaviour {
         return coords;
 
     }
+		
     #endregion
 
     [System.Serializable]

@@ -53,15 +53,28 @@ public class BlockSelector : MonoBehaviour {
             Vector3 playerPosition = cManager.snapCoordsToGrid(this.gameObject.transform.position);
 
             bool canfit = true;
-            //Check if there's space for selecton
-            
-                for (int i = 0; i < blockSize; i++)
-                {
-                    short b = cManager.getBlockTypeAtAbsPos(trackedCursor + new Vector3(0, i * cManager.blockSize, 0));
 
-                    canfit = canfit && (b == (short)BLOCKID.Air);
-                }
-            canfit = canfit || removing;
+			if (!removing) {
+				ChunkManager.Chunk container = cManager.getChunkAtPos (hitBlock);
+
+				for (int f = 0; f < blockSize; f++) {
+					canfit = true;
+					Vector3 originalLocalPos = cManager.getLocalBlockCoords (hitBlock);
+
+					//Check if there's space for selection
+					for (int i = 0; i < blockSize; i++) {
+						canfit = canfit && (container.blockTypes [(int)originalLocalPos.x, (int)originalLocalPos.z, (int)originalLocalPos.y + i] == (short)BLOCKID.Air);
+					}
+
+					if (canfit)
+					{
+						break;
+					}
+					hitBlock += new Vector3 (0, -cManager.blockSize, 0);
+				}
+			}
+			canfit = canfit || removing;
+
 
             if (hitBlock.x == playerPosition.x && hitBlock.z == playerPosition.z)
             {
@@ -93,48 +106,6 @@ public class BlockSelector : MonoBehaviour {
         }
 
     }
-
-	//public Vector3 snapCoordsToGrid(Vector3 position){
-	//	int[] gridPos =getBlockCoords (position);
-	//	return new Vector3 (gridPos [0] * 0.866f * 2f + Mathf.Abs (gridPos [2] % 2) * 0.866f, gridPos [1] * cManager.blockSize - 0.002f, gridPos [2] * 1.5f);
-	//}
-
-
-
-	//public int[] getBlockCoords(Vector3 position)
-	//{
-
-	//	int zRound = Mathf.FloorToInt ((position.z + 1) / 1.5f);
-	//	float z = (float)zRound * 1.5f;
-
-	//	int xRound = Mathf.FloorToInt ((position.x + 0.866f + Mathf.Abs(zRound % 2)*0.866f) / (2 * 0.866f));
-	//	float x = xRound * 2f * 0.866f - Mathf.Abs(zRound % 2)*0.866f;
-
-	//	float zInTile = position.z + 1 - z;
-	//	float xInTile = position.x - x;
-
-
-	//	if (zInTile > Mathf.Abs (xInTile * (0.866f / 2f))) 
-	//	{
-	//		xRound -= Mathf.Abs(zRound % 2);
-	//	} 
-	//	else 
-	//	{
-	//		//z -= 1.5f;
-	//		zRound--;
-	//		if (xInTile > 0) {
-	//			//x += 0.866f;
-	//			//xRound++;
-	//		} else {
-	//			//x -= 0.866f;
-	//			xRound--;
-	//		}
-	//	}
-	//	int[] coords = {xRound , Mathf.FloorToInt (position.y / cManager.blockSize), zRound};
-    
-	//	return coords;
-		
-	//}
 
 	public bool isBlockSelected(){
 		return blockSelected && selector.active;

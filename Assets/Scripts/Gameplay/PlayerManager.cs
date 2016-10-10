@@ -46,7 +46,7 @@ public class PlayerManager : MonoBehaviour {
                             ChunkManager.Chunk chunk = cManager.getChunkAtPos(bSelector.getSelectedBlock());
                             Block b = new Block(bSelector.getSelectedBlock(), selectedItem.stack * 0.25f, (short)selectedItem.blockId);
 
-                            if (cManager.addBlock(b, chunk, true, true))
+                            if (cManager.AddBlock(b, chunk, true, true))
                             {
 
                             }

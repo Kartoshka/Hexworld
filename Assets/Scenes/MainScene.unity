@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ef9bfba99e9449cd89de0f2e9fd8161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  heightPlayer: 3.5
+  heightPlayer: 0
   cManager: {fileID: 575319496}
   SelectorPrefab: {fileID: 1000010231260202, guid: efe87306ab9404cdeb586b9fa0eb3f56,
     type: 2}
@@ -841,10 +841,6 @@ Prefab:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
   m_IsPrefabParent: 0
@@ -886,8 +882,8 @@ MonoBehaviour:
   - blockId: 3
     stack: 1
     numItems: 1000
-    add: 0
-    remove: 1
+    add: 1
+    remove: 0
   - blockId: 1
     stack: 1
     numItems: 1000
