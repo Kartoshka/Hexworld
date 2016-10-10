@@ -32,8 +32,6 @@ public class LoadChunks : AbChunkModifier
 		for (int t = 0; t < numThreads; t++) {
 			this.StartCoroutineAsync (continuousGenThread (cManager));
 		}
-
-		//traversal = StartCoroutine (TraverseList (cManager));
     }
     public override void OnMoveChunks(ChunkManager cManager)
     {
@@ -65,7 +63,6 @@ public class LoadChunks : AbChunkModifier
 	/// <param name="cManager">C manager.</param>
     private void TraverseList(ChunkManager cManager)
     {
-		
 			int startFrame = Environment.TickCount;
 
 			if (awaitingInstantiation == null) {
@@ -135,10 +132,16 @@ public class LoadChunks : AbChunkModifier
 
 		for (int c = 0; c < chunks.Count; c++) {
 			Vector2 pos = new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]);
-			if (!currentlyGenerating.ContainsKey(pos) && chunks[c][2] < radius+0.5 && !cManager.chunkIsLoaded (pos) && !cManager.chunkIsGenerating (pos)) {
-				requests.Enqueue (pos);
-				currentlyGenerating.Add (pos, true);
-			}
+            lock (requests)
+            {
+
+                if (!currentlyGenerating.ContainsKey(pos) && chunks[c][2] < radius + 0.5 && !cManager.chunkIsLoaded(pos) && !cManager.chunkIsGenerating(pos)&& !requests.Contains(pos))
+                {
+                    requests.AddFirst(pos);
+                    currentlyGenerating.Add(pos, true);
+                }
+            }
+            
 		}
 
     }
@@ -146,7 +149,7 @@ public class LoadChunks : AbChunkModifier
 	
 	#region Asynchrounous method body
     private bool run = true;
-	private Queue<Vector2> requests = new Queue<Vector2>();
+	private LinkedList<Vector2> requests = new LinkedList<Vector2>();
     private object requestLock = new object();
 
 
@@ -163,7 +166,10 @@ public class LoadChunks : AbChunkModifier
             {
                 if (requests.Count > 0)
                 {
-                    pos = requests.Dequeue();
+                    pos = requests.Last.Value;
+                    
+                    requests.RemoveLast();
+
                     gen = true;
                 }
             }

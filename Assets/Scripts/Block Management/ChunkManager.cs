@@ -259,7 +259,7 @@ public class ChunkManager : MonoBehaviour {
 	public Chunk instantiateChunk(Chunk c)
     {
 		
-		GameObject holder = new GameObject("Holder of chunk ( " + c.pos.x + " , " + c.pos.z + " ) " + "of size " + size);
+		GameObject holder = new GameObject("Holder of chunk ( " + c.pos.x + " , " + c.pos.y + " ) " + "of size " + size);
 		c.mainHolder = holder;
 
 		GameObject stoneHolder = new GameObject ("StoneHolder");
@@ -384,8 +384,8 @@ public class ChunkManager : MonoBehaviour {
 		this.gameObject.transform.SetParent (originalParent);
 
 		if (deleteOriginal) {
-			Destroy (hMesh);
-		} else {
+			DestroyImmediate (hMesh);
+        } else {
 			hObj.SetActive (false);
 		}
 
@@ -476,7 +476,6 @@ public class ChunkManager : MonoBehaviour {
 					if (obj != null) {
 						MeshFilter filter = obj.GetComponent<MeshFilter> ();
 						if (filter != null) {
-							Destroy (filter.mesh);
                             Destroy(filter.sharedMesh);
                             Destroy(filter);
                         }
@@ -526,6 +525,7 @@ public class ChunkManager : MonoBehaviour {
 
 	public Chunk getChunkAtPos(Vector3 position){
 
+        //Snap position into place
 		int x = Mathf.FloorToInt(position.x / ((float)size * xDistanceBlocks));
 		int z = Mathf.FloorToInt(position.z / ((float)size * zDistanceBlocks));
 
@@ -533,20 +533,102 @@ public class ChunkManager : MonoBehaviour {
 		bool success = loadedChunks.TryGetValue (new Vector2 (x, z), out result);
 
 		if (!success) {
-			new UnityException ("Chunk not laoded, cannot retrieve");
+			new UnityException ("Chunk not loaded, cannot retrieve");
 		}
 
 		return result;
-		//First snap position to grid
-
 	}
-	#endregion
+
+     public short getBlockTypeAtAbsPos(Vector3 pos)
+    {
+
+        int[] ar = (getGlobalBlockCoords(pos));
+        ChunkManager.Chunk chun = this.getChunkAtPos(pos);
+
+        int x = (int)(ar[0] - chun.pos.x * this.size);
+        int y = (int)ar[1]+1;
+        int z = (int)(ar[2] - chun.pos.y * this.size);
+
+        if (x >= size)
+        {
+            x = (int)(ar[0] - (chun.pos.x+1) * this.size);
+
+        }
+        if (z >= size)
+        {
+           z = (int)(ar[2] - (chun.pos.y + 1) * this.size);
+        }
+        short result = chun.blockTypes[x, z, y];
+        if (result == (short)BLOCKID.Air)
+        {
+            Debug.Log("air");
+        }
+        else if (result == (short)BLOCKID.Dirt)
+        {
+            Debug.Log("dirt");
+        }
+        else if (result == (short)BLOCKID.Stone)
+        {
+            Debug.Log("stone");
+        }
+        else if (result == (short)BLOCKID.Grass)
+        {
+            Debug.Log("grass");
+        }
+        Debug.Log(" at " + x + "," + y + "," + z +" chunk is "+chun.pos);
+        return chun.blockTypes[x,z,y];
+    }
+
+    public Vector3 snapCoordsToGrid(Vector3 position)
+    {
+        int[] gridPos = getGlobalBlockCoords(position);
+        return new Vector3(gridPos[0] * 0.866f * 2f + Mathf.Abs(gridPos[2] % 2) * 0.866f, gridPos[1] * this.blockSize - 0.002f, gridPos[2] * 1.5f);
+    }
+
+    public int[] getGlobalBlockCoords(Vector3 position)
+    {
+
+        int zRound = Mathf.FloorToInt((position.z + 1) / 1.5f);
+        float z = (float)zRound * 1.5f;
+
+        int xRound = Mathf.FloorToInt((position.x + 0.866f + Mathf.Abs(zRound % 2) * 0.866f) / (2 * 0.866f));
+        float x = xRound * 2f * 0.866f - Mathf.Abs(zRound % 2) * 0.866f;
+
+        float zInTile = position.z + 1 - z;
+        float xInTile = position.x - x;
+
+
+        if (zInTile > Mathf.Abs(xInTile * (0.866f / 2f)))
+        {
+            xRound -= Mathf.Abs(zRound % 2);
+        }
+        else
+        {
+            //z -= 1.5f;
+            zRound--;
+            if (xInTile > 0)
+            {
+                //x += 0.866f;
+                //xRound++;
+            }
+            else
+            {
+                //x -= 0.866f;
+                xRound--;
+            }
+        }
+        int[] coords = { xRound, Mathf.FloorToInt(position.y / this.blockSize), zRound };
+
+        return coords;
+
+    }
+    #endregion
 
     [System.Serializable]
     public struct Chunk
     {
         public int size;
-        public Vector3 pos;
+        public Vector2 pos;
 		public GameObject mainHolder;
         public List<GameObject> hexObjs;
         public short[,,] blockTypes;
