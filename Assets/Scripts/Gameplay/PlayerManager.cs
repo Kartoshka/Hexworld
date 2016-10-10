@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using InventoryManager;
+using Consts;
 
 public class PlayerManager : MonoBehaviour {
 
@@ -21,13 +22,16 @@ public class PlayerManager : MonoBehaviour {
 		if (Input.GetButtonDown ("NextItem")) {
 			inv.nextItem ();
 		}
-		HexObj selectedItem = inv.getSelection ();
 
-		removing = selectedItem.remove;
+		removing = inv.getCurrentRemove ();
 
-        if (removing || selectedItem.add)
+		int stack = inv.getCurrentStack ();
+		int numItems = inv.getCurrentNumItems ();
+		BLOCKID id = inv.getCurrentID ();
+
+		if (removing || inv.getCurrentAdd())
         {
-            bSelector.UpdateState(removing, !removing, selectedItem.stack);
+			bSelector.UpdateState(removing, !removing, stack);
             //If Left click
             if (Input.GetButtonDown("Fire1") && bSelector.isBlockSelected())
             {
@@ -38,18 +42,17 @@ public class PlayerManager : MonoBehaviour {
                 }
                 else //add block
                 {               
-                    if (selectedItem.numItems > 0)
+					if (numItems > 0)
                     {
                         try
                         {
-                            selectedItem.numItems -= 1;
                             ChunkManager.Chunk chunk = cManager.getChunkAtPos(bSelector.getSelectedBlock());
-                            Block b = new Block(bSelector.getSelectedBlock(), selectedItem.stack * 0.25f, (short)selectedItem.blockId);
+							Block b = new Block(bSelector.getSelectedBlock(), stack* 0.25f, (short)id);
 
-                            if (cManager.AddBlock(b, chunk, true, true))
+							if (inv.getCurrentNumItems()-1*inv.getCurrentStack()>=0 && cManager.AddBlock(b, chunk, true, true))
                             {
-
-                            }
+								inv.IncrementCurrentNumItems(-1*inv.getCurrentStack());
+							}
 
                         }
                         catch (UnityException e)
@@ -68,7 +71,9 @@ public class PlayerManager : MonoBehaviour {
 
 
 		if (Input.GetButtonDown ("Fire2")) {
-			removing = !removing;
+			Debug.Log (inv.getCurrentStack ());
+
+			inv.IncrementCurrentStack (1);
 		}
 		
 	}

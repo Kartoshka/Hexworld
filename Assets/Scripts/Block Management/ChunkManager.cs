@@ -19,9 +19,9 @@ public class ChunkManager : MonoBehaviour {
     public GameObject trackedObject;
 
     //public GameObject hexObj;
-    public GameObject block_stone;
-    public GameObject block_dirt;
-    public GameObject block_grass;
+	private GameObject block_stone;
+	private GameObject block_dirt;
+	private GameObject block_grass;
 
 	public Material[] blockMaterials;
 
@@ -69,6 +69,10 @@ public class ChunkManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+
+		block_stone = ConstsClass.getPrefab (BLOCKID.Stone);
+		block_grass = ConstsClass.getPrefab (BLOCKID.Grass);
+		block_dirt = ConstsClass.getPrefab (BLOCKID.Dirt);
 
 		originalPos = this.transform.position;
 		originalScale = this.transform.localScale;
