@@ -583,7 +583,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &620707949
 GameObject:
@@ -676,7 +676,7 @@ Transform:
   m_Children:
   - {fileID: 620707950}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 54.96, y: 0, z: 0}
 --- !u!108 &637373413
 Light:
@@ -797,7 +797,7 @@ Transform:
   m_LocalScale: {x: 40.194664, y: 40.19464, z: 40.19464}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 90}
 --- !u!1001 &1153822875
 Prefab:
@@ -836,7 +836,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -933,10 +933,6 @@ MonoBehaviour:
   ui: {fileID: 1803592402}
   itemList: []
   selectedItem: 0
---- !u!4 &1597006547 stripped
-Transform:
-  m_PrefabParentObject: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
-  m_PrefabInternal: {fileID: 1153822875}
 --- !u!1 &1737253185
 GameObject:
   m_ObjectHideFlags: 0
@@ -1087,7 +1083,7 @@ GameObject:
   - component: {fileID: 1803592399}
   - component: {fileID: 1803592402}
   m_Layer: 0
-  m_Name: Canvas
+  m_Name: UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1103,7 +1099,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 1597006547}
+  m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1183,7 +1179,7 @@ MonoBehaviour:
   horizontalOffset: 25
   verticalOffset: 10
   rowCount: 3
-  sizeBigIcon: 90
+  sizeBigIcon: 120
   _selected: {fileID: 21300000, guid: 76c337bdf8fa544b8b00f3cdd3304a8c, type: 3}
   textSize: 35
   textFont: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
@@ -1270,5 +1266,5 @@ Transform:
   m_LocalScale: {x: 40.194664, y: 40.19464, z: 40.19464}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}

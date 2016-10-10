@@ -23,7 +23,6 @@ public class Item  {
 		{
 			if(value>0){
 				_stack = (int)Mathf.Clamp((value%(maxStack+1)),1,maxStack);
-
 			}
 		}
 	}

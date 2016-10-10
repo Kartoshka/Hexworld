@@ -19,7 +19,7 @@ namespace InventoryManager{
 			BLOCKID[] blocks = ConstsClass.getAllIDs ();
 
 			foreach (BLOCKID b in blocks) {
-				itemList.Add (new Item (b,1,10,true));
+				itemList.Add (new Item (b,1,99,true));
 			}
 
 			if (ui != null) {
@@ -74,6 +74,9 @@ namespace InventoryManager{
 
 		public void IncrementCurrentNumItems(int amount){
 			this.getSelection ().numItems = this.getSelection ().numItems + amount;
+			if (this.getSelection ().numItems == 0) {
+				this.getSelection ().numItems = 99;
+			}
 			if (ui != null) {
 				ui.UpdateValues ();
 			}
