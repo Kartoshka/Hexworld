@@ -1,4 +1,4 @@
-# Hexacraft
+# Hexworld
 Procedurally generated Minecraft-style terrain using hextiles instead of square tiles.
 (CREATED IN UNITY VERSION 5.0b3, will most likely break if imported with previous versions) 
 
