@@ -20,12 +20,12 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.71139705, g: 0.7356237, b: 0.75, a: 1}
-  m_AmbientEquatorColor: {r: 0.9411765, g: 0.9752322, b: 1, a: 1}
-  m_AmbientGroundColor: {r: 0, g: 0.17241383, b: 1, a: 1}
+  m_AmbientSkyColor: {r: 0.77719504, g: 0.82011765, b: 0.8455882, a: 1}
+  m_AmbientEquatorColor: {r: 0.83823526, g: 0.83823526, b: 0.83823526, a: 1}
+  m_AmbientGroundColor: {r: 0.44852942, g: 0.44852942, b: 0.44852942, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 3
-  m_SkyboxMaterial: {fileID: 2100000, guid: 27a8cd14a42240f449c74becc69e0bf7, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: fdc20b55d31143b4486d5300afd0119c, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -64,7 +64,7 @@ LightmapSettings:
     m_CompAOExponentDirect: 0
     m_Padding: 2
     m_LightmapParameters: {fileID: 0}
-    m_LightmapsBakeMode: 1
+    m_LightmapsBakeMode: 0
     m_TextureCompression: 1
     m_DirectLightInLightProbes: 1
     m_FinalGather: 0
@@ -898,6 +898,10 @@ Prefab:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 14300000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
+      propertyPath: m_StepOffset
+      value: 0.6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
   m_IsPrefabParent: 0
@@ -1045,10 +1049,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanceFog: 1
-  excludeFarPixels: 0
+  excludeFarPixels: 1
   useRadialDistance: 1
   heightFog: 1
-  height: 3
+  height: 5
   heightDensity: 4
   startDistance: 5
   fogShader: {fileID: 4800000, guid: 70d8568987ac0499f952b54c7c13e265, type: 3}
