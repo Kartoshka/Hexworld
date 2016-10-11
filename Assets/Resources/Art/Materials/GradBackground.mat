@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: GradBackground
-  m_Shader: {fileID: 4800000, guid: 558a381263fc53540a003c69d9a66468, type: 3}
+  m_Shader: {fileID: 4800000, guid: a66a9ad0fc3190b49a6fa11528ef2ff8, type: 3}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 1
   m_CustomRenderQueue: -1
@@ -113,6 +113,15 @@ Material:
         name: _Parallax
       second: 0.02
     - first:
+        name: _SkyExponent1
+      second: 8.5
+    - first:
+        name: _SkyExponent2
+      second: 3
+    - first:
+        name: _SkyIntensity
+      second: 1
+    - first:
         name: _SmoothnessTextureChannel
       second: 0
     - first:
@@ -121,6 +130,21 @@ Material:
     - first:
         name: _SrcBlend
       second: 1
+    - first:
+        name: _SunAlpha
+      second: 550
+    - first:
+        name: _SunAltitude
+      second: 38
+    - first:
+        name: _SunAzimuth
+      second: 20
+    - first:
+        name: _SunBeta
+      second: 1
+    - first:
+        name: _SunIntensity
+      second: 2
     - first:
         name: _UVSec
       second: 0
@@ -143,3 +167,18 @@ Material:
     - first:
         name: _EmissionColor
       second: {r: 0, g: 0, b: 0, a: 1}
+    - first:
+        name: _SkyColor1
+      second: {r: 0.3602941, g: 0.6797792, b: 1, a: 0}
+    - first:
+        name: _SkyColor2
+      second: {r: 0.6691177, g: 0.8905353, b: 1, a: 0}
+    - first:
+        name: _SkyColor3
+      second: {r: 0.4784314, g: 0.82745105, b: 1, a: 0}
+    - first:
+        name: _SunColor
+      second: {r: 1, g: 0.99, b: 0.87, a: 1}
+    - first:
+        name: _SunVector
+      second: {r: 0.269, g: 0.615, b: 0.74, a: 0}

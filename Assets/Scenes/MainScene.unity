@@ -15,7 +15,7 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 7
   m_Fog: 0
-  m_FogColor: {r: 0.4784314, g: 0.82745105, b: 1, a: 1}
+  m_FogColor: {r: 0.52156866, g: 0.79215693, b: 1, a: 1}
   m_FogMode: 3
   m_FogDensity: 0.01
   m_LinearFogStart: 0
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae03018aecc9c0d47abefdb9321e1bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 24
   startRadius: 8
   numThreads: 1
 --- !u!4 &26337148
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d277adbb36be64eafacbcb23ed310b7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unloadPastDistance: 24
+  unloadPastDistance: 32
   delayToUnloadAssets: 10
 --- !u!4 &203889928
 Transform:
