@@ -358,7 +358,11 @@ public class ChunkManager : MonoBehaviour {
 			transform.parent = subChunk.transform;
 			transform.localScale = new Vector3 (1, 1, b.vertScale);
 			transform.localPosition = b.pos;
-			scaleUV (hMesh, transform.localScale);
+
+
+			int yPos = (int)(b.pos.y * 4);
+
+			scaleUV (hMesh, transform.localScale, yPos);
 
 
 			finalMesh = new Mesh ();
@@ -426,28 +430,32 @@ public class ChunkManager : MonoBehaviour {
 
 	#region UVScaling
     //Scale the UV coordinates of a block's mesh
+	//DEPRICATED (I think)
     private void scaleUV(GameObject obj)
     {
+		//int ypos = (int)obj.transform.position.y;
+
+		//float yOffset = 0.125f * (((int)obj.transform.position.y) % 8);
+		//Debug.Log (yOffset);
+
         obj.GetComponent<MeshFilter>().sharedMesh = Instantiate(obj.GetComponent<MeshFilter>().sharedMesh);
-        //obj.GetComponent<MeshFilter>().sharedMesh = (Mesh)Instantiate(obj.GetComponent<MeshFilter>().sharedMesh);
         Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
         Vector3[] vertices = mesh.vertices;
         Vector2[] uvs = new Vector2[vertices.Length];
 
-        //Debug.Log("--Next Mesh--");
 
         for (int i = 0; i < uvs.Length; i++)
         {
             uvs[i][0] = mesh.uv[i][0];
 
-            if (mesh.uv[i][1] == 0.5)
-            {
-                uvs[i][1] = 0.5f * obj.transform.localScale[2];
-            }
-            else
-            {
-                uvs[i][1] = mesh.uv[i][1];
-            }
+			if (mesh.uv [i] [0] <= 0.5) { //If vertices pertaining to vertical faces
+				if (mesh.uv [i] [1] == 0.5) { //If top vertices
+					uvs [i] [1] = 0.5f * obj.transform.localScale [2];
+				} else { //Bottom vertices
+					uvs [i] [1] = mesh.uv [i] [1];
+				}
+				//uvs [i] [1] += yOffset;
+			}
         }
 
         mesh.uv = uvs;
@@ -455,23 +463,28 @@ public class ChunkManager : MonoBehaviour {
     }
 
 	//Scale UV coordinates of a mesh instead of a gameobject, used for more optimied chunk generation
-	private void scaleUV(Mesh mesh,Vector3 localScale){
+	private void scaleUV(Mesh mesh,Vector3 localScale, int yPos){
+
+		float yOffset = 0.125f * (yPos % 8);
+
 		Vector3[] vertices = mesh.vertices;
 		Vector2[] uvs = new Vector2[vertices.Length];
-
-		//Debug.Log("--Next Mesh--");
 
 		for (int i = 0; i < uvs.Length; i++)
 		{
 			uvs[i][0] = mesh.uv[i][0];
 
-			if (mesh.uv[i][1] == 0.5)
-			{
-				uvs[i][1] = 0.5f * localScale[2];
-			}
-			else
-			{
-				uvs[i][1] = mesh.uv[i][1];
+			if (mesh.uv [i] [0] <= 0.5) { //If vertices pertaining to vertical faces
+				if (mesh.uv [i] [1] == 0.5) { //If top vertices
+					uvs [i] [1] = 0.5f * localScale [2];
+				} else {
+					uvs [i] [1] = mesh.uv [i] [1];
+				}
+
+				uvs [i] [1] += yOffset; //Offset coordinates on Y axis according to block's height offset
+
+			} else {
+				uvs [i] [1] = mesh.uv [i] [1];
 			}
 		}
 
