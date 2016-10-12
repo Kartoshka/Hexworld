@@ -271,6 +271,9 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 7efac4912dda2d54c894d7265cc4da81, type: 2}
   - {fileID: 2100000, guid: 9ebfe8cc88c1b7a469ca26cb3a928a38, type: 2}
   - {fileID: 2100000, guid: ff9b5387b8ac840479048c4fe647b655, type: 2}
+  - {fileID: 2100000, guid: f88bbd92b42553d48a940f82ea11db65, type: 2}
+  - {fileID: 2100000, guid: ab1d2cd23dd56df48b6701b06ad8e2e5, type: 2}
+  - {fileID: 2100000, guid: 3eeeadcf649bb67418b72a69164a569a, type: 2}
   curve:
     serializedVersion: 2
     m_Curve:
@@ -1422,7 +1425,7 @@ MonoBehaviour:
   alphaSmallIcons: 0.8
   horizontalOffset: 25
   verticalOffset: 10
-  rowCount: 3
+  rowCount: 6
   sizeBigIcon: 120
   _selected: {fileID: 21300000, guid: 76c337bdf8fa544b8b00f3cdd3304a8c, type: 3}
   textSize: 35

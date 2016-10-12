@@ -22,6 +22,9 @@ public class ChunkManager : MonoBehaviour {
 	private GameObject block_stone;
 	private GameObject block_dirt;
 	private GameObject block_grass;
+	private GameObject block_stoneTile;
+	private GameObject block_crystalO;
+	private GameObject block_lampO;
 
 	public Material[] blockMaterials;
 
@@ -73,6 +76,9 @@ public class ChunkManager : MonoBehaviour {
 		block_stone = ConstsClass.getPrefab (BLOCKID.Stone);
 		block_grass = ConstsClass.getPrefab (BLOCKID.Grass);
 		block_dirt = ConstsClass.getPrefab (BLOCKID.Dirt);
+		block_stoneTile = ConstsClass.getPrefab (BLOCKID.StoneTile);
+		block_crystalO = ConstsClass.getPrefab (BLOCKID.CrystalO);
+		block_lampO = ConstsClass.getPrefab (BLOCKID.LampO);
 
 		originalPos = this.transform.position;
 		originalScale = this.transform.localScale;
@@ -270,10 +276,16 @@ public class ChunkManager : MonoBehaviour {
 		GameObject stoneHolder = new GameObject ("StoneHolder");
 		GameObject dirtHolder = new GameObject ("DirtHolder");
 		GameObject grassHolder = new GameObject ("GrassHolder");
+		GameObject stoneTileHolder = new GameObject ("StoneTileHolder");
+		GameObject crystalOHolder = new GameObject ("CrystalOHolder");
+		GameObject lampOHolder = new GameObject ("LampOHolder");
 
 		stoneHolder.transform.SetParent (holder.transform);
 		dirtHolder.transform.SetParent (holder.transform);
 		grassHolder.transform.SetParent (holder.transform);
+		stoneTileHolder.transform.SetParent (holder.transform);
+		crystalOHolder.transform.SetParent (holder.transform);
+		lampOHolder.transform.SetParent (holder.transform);
 
 		int t = 0;
 		foreach (Transform child in holder.transform) {
@@ -300,6 +312,9 @@ public class ChunkManager : MonoBehaviour {
 		stoneHolder.GetComponent<MeshCollider> ().sharedMesh = stoneHolder.GetComponent<MeshFilter> ().sharedMesh;
 		grassHolder.GetComponent<MeshCollider> ().sharedMesh = grassHolder.GetComponent<MeshFilter> ().sharedMesh;
 		dirtHolder.GetComponent<MeshCollider> ().sharedMesh = dirtHolder.GetComponent<MeshFilter> ().sharedMesh;
+		stoneTileHolder.GetComponent<MeshCollider> ().sharedMesh = stoneTileHolder.GetComponent<MeshFilter> ().sharedMesh;
+		crystalOHolder.GetComponent<MeshCollider> ().sharedMesh = crystalOHolder.GetComponent<MeshFilter> ().sharedMesh;
+		lampOHolder.GetComponent<MeshCollider> ().sharedMesh = lampOHolder.GetComponent<MeshFilter> ().sharedMesh;
 
 
         chunks.Add(c);
@@ -324,31 +339,48 @@ public class ChunkManager : MonoBehaviour {
         Transform transform = null;
 		GameObject subChunk = null;
 
-		if (b.blockType == (short)BLOCKID.Stone)
-		{
+		if (b.blockType == (short)BLOCKID.Stone) {
 			//hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
 			hObj = block_stone;
 			hMesh = (Mesh)Instantiate (block_stone.GetComponent<MeshFilter> ().sharedMesh);
-			subChunk = c.mainHolder.transform.FindChild("StoneHolder").gameObject;
-		}
-		else if (b.blockType == (short)BLOCKID.Dirt)
-		{
+			subChunk = c.mainHolder.transform.FindChild ("StoneHolder").gameObject;
+		} 
+		else if (b.blockType == (short)BLOCKID.Dirt) {
 			//hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
 			hObj = block_dirt;
 			hMesh = (Mesh)Instantiate (block_dirt.GetComponent<MeshFilter> ().sharedMesh);
 
-			subChunk = c.mainHolder.transform.FindChild("DirtHolder").gameObject;
-		}
-		else if (b.blockType == (short)BLOCKID.Grass)
-		{
+			subChunk = c.mainHolder.transform.FindChild ("DirtHolder").gameObject;
+		} 
+		else if (b.blockType == (short)BLOCKID.Grass) {
 			//hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
 			hObj = block_grass;
 			hMesh = (Mesh)Instantiate (block_grass.GetComponent<MeshFilter> ().sharedMesh);
 
-			subChunk = c.mainHolder.transform.FindChild("GrassHolder").gameObject;
+			subChunk = c.mainHolder.transform.FindChild ("GrassHolder").gameObject;
+		} 
+		else if (b.blockType == (short)BLOCKID.StoneTile) {
+			hObj = block_stoneTile;
+			hMesh = (Mesh)Instantiate (block_stoneTile.GetComponent<MeshFilter> ().sharedMesh);
+
+			subChunk = c.mainHolder.transform.FindChild ("StoneTileHolder").gameObject;
+		}
+		else if (b.blockType == (short)BLOCKID.CrystalO) {
+			hObj = block_crystalO;
+			hMesh = (Mesh)Instantiate (block_crystalO.GetComponent<MeshFilter> ().sharedMesh);
+
+			subChunk = c.mainHolder.transform.FindChild ("CrystalOHolder").gameObject;
+		}
+		else if (b.blockType == (short)BLOCKID.LampO) {
+			hObj = block_lampO;
+			hMesh = (Mesh)Instantiate (block_lampO.GetComponent<MeshFilter> ().sharedMesh);
+
+			subChunk = c.mainHolder.transform.FindChild ("LampOHolder").gameObject;
 		}
 
 		Mesh[] twoMeshes = { hMesh, subChunk.GetComponent<MeshFilter> ().sharedMesh };
+
+
 
 		if (hMesh != null) {
 			
@@ -431,7 +463,8 @@ public class ChunkManager : MonoBehaviour {
 
 	#region UVScaling
     //Scale the UV coordinates of a block's mesh
-	//DEPRICATED (I think)
+	//DEPRICATED
+	/*
     private void scaleUV(GameObject obj)
     {
 		//int ypos = (int)obj.transform.position.y;
@@ -462,6 +495,7 @@ public class ChunkManager : MonoBehaviour {
         mesh.uv = uvs;
 
     }
+    */
 
 	//Scale UV coordinates of a mesh instead of a gameobject, used for more optimied chunk generation
 	private void scaleUV(Mesh mesh,Vector3 localScale, int yPos){
