@@ -224,6 +224,7 @@ public class ChunkManager : MonoBehaviour {
                     else
                     {
                         blockValues[i, j, k] = (short)BLOCKID.Air;
+						dirtCount = 0;
                     }
 
 
