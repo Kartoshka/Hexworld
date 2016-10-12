@@ -57,13 +57,11 @@ public class BlockSelector : MonoBehaviour {
 
 
 			if (!removing) {
-				ChunkManager.Chunk container = cManager.getChunkAtPos (hitBlock); //NOT SURE
+				ChunkManager.Chunk container = cManager.getChunkAtPos (hitBlock);
 
 				for (int f = 0; f < blockSize; f++) {
 					canfit = true;
-					Vector3 originalLocalPos = cManager.getLocalBlockCoords (hitBlock); //NOT SURE
-
-					Debug.Log (originalLocalPos);
+					Vector3 originalLocalPos = cManager.getLocalBlockCoords (hitBlock); 
 
 					//Check if there's space for selection
 					for (int i = 0; i < blockSize; i++) {

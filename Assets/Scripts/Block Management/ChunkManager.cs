@@ -609,7 +609,7 @@ public class ChunkManager : MonoBehaviour {
 	public Vector3 getLocalBlockCoords(Vector3 pos){
 		int[] ar = (getGlobalBlockIndex(pos));
 		ChunkManager.Chunk chun = this.getChunkAtPos(pos);
-		Debug.Log (chun.pos);
+
 		int x = (int)(ar[0] - chun.pos.x * this.size);
 		int y = (int)ar[1] +2;
 		int z = (int)(ar[2] - chun.pos.y * this.size);

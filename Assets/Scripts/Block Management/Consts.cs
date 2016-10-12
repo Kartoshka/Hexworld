@@ -16,7 +16,7 @@ public class ConstsClass {
 
 	private static string[] fileNames = { "HB_Air", "HB_Stone", "HB_Dirt", "HB_Grass" };
 
-	private static string[] iconNames = { "AirIco", "StoneIco", "DirtIco", "GrassIco" };
+	private static string[] iconNames = { "Icon_Air", "Icon_Stone", "Icon_Dirt", "Icon_Grass" };
 
 	public static GameObject getPrefab(BLOCKID id){
 		return Resources.Load ("Art/Models/Blocks/" + fileNames [(int)(short)id]) as GameObject;
