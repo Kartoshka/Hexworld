@@ -556,6 +556,7 @@ public class ChunkManager : MonoBehaviour {
 		return generatingChunks.Count;
 	}
 
+	//Mildly useless, should only be used for rough player position calculation
     public Vector2 findCurrentChunk()
     {
         int x = Mathf.FloorToInt(trackedObject.transform.position.x / ((float)size * xDistanceBlocks));
@@ -569,11 +570,9 @@ public class ChunkManager : MonoBehaviour {
 
 		int[] pos = getGlobalBlockIndex (position);
 
-        //Snap position into place
-		//int x = Mathf.FloorToInt((position.x) / ((float)size * xDistanceBlocks));
-		int z = Mathf.FloorToInt(pos[2] / ((float)size * zDistanceBlocks));
-
-		int x = Mathf.FloorToInt((pos[0]) / ((float)size * xDistanceBlocks));
+		//Use global block index to find correct chunk
+		int x = Mathf.FloorToInt ((float)pos [0] / size);
+		int z = Mathf.FloorToInt ((float)pos [2] / size);
 
 		Chunk result;
 		bool success = loadedChunks.TryGetValue (new Vector2 (x, z), out result);
