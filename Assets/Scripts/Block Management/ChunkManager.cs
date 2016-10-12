@@ -52,6 +52,8 @@ public class ChunkManager : MonoBehaviour {
 
 	public OpenSimplexNoise[] noise;
 
+	private OpenSimplexNoise crystalONoise;
+
     public float pScale = 0.02f;
     public float pScale2 = 0.008f;
 
@@ -93,6 +95,8 @@ public class ChunkManager : MonoBehaviour {
 		for(int n=0;n<noise.Length;n++){
 			noise[n] = new OpenSimplexNoise (octaveSeeds[n]*gameSeed);
 		}
+
+		crystalONoise = new OpenSimplexNoise(42);
 
         loadedChunks = new Dictionary<Vector2, Chunk>();
 		generatingChunks = new Dictionary<Vector2, bool> ();
@@ -227,7 +231,11 @@ public class ChunkManager : MonoBehaviour {
                         }
                         else
                         {
-                            blockValues[i, j, k] = (short)BLOCKID.Stone;
+							if (crystalONoise.Evaluate (blockX * 0.2f, (float)k * blockSize * 0.2f, blockZ * 0.2f) < 0.6)
+								blockValues [i, j, k] = (short)BLOCKID.Stone;
+							else
+								blockValues [i, j, k] = (short)BLOCKID.CrystalO;
+							
                             dirtCount = 0;
                         }
                     }
@@ -636,7 +644,7 @@ public class ChunkManager : MonoBehaviour {
         ChunkManager.Chunk chun = this.getChunkAtPos(pos);
 
         int x = (int)(ar[0] - chun.pos.x * this.size);
-        int y = (int)ar[1] +2;
+        int y = (int)ar[1] +1; //Changed from +2
         int z = (int)(ar[2] - chun.pos.y * this.size);
 
         if (x >= size)
@@ -656,7 +664,7 @@ public class ChunkManager : MonoBehaviour {
 		ChunkManager.Chunk chun = this.getChunkAtPos(pos);
 
 		int x = (int)(ar[0] - chun.pos.x * this.size);
-		int y = (int)ar[1] +2;
+		int y = (int)ar[1] +1; //Changed from +2
 		int z = (int)(ar[2] - chun.pos.y * this.size);
 
 		return new Vector3 (x, y, z);
