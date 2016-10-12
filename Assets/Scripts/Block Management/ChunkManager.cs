@@ -567,9 +567,13 @@ public class ChunkManager : MonoBehaviour {
 
 	public Chunk getChunkAtPos(Vector3 position){
 
+		int[] pos = getGlobalBlockIndex (position);
+
         //Snap position into place
-		int x = Mathf.FloorToInt(position.x / ((float)size * xDistanceBlocks));
-		int z = Mathf.FloorToInt(position.z / ((float)size * zDistanceBlocks));
+		//int x = Mathf.FloorToInt((position.x) / ((float)size * xDistanceBlocks));
+		int z = Mathf.FloorToInt(pos[2] / ((float)size * zDistanceBlocks));
+
+		int x = Mathf.FloorToInt((pos[0]) / ((float)size * xDistanceBlocks));
 
 		Chunk result;
 		bool success = loadedChunks.TryGetValue (new Vector2 (x, z), out result);
@@ -584,7 +588,7 @@ public class ChunkManager : MonoBehaviour {
      public short getBlockTypeAtAbsPos(Vector3 pos)
     {
 
-        int[] ar = (getGlobalBlockCoords(pos));
+        int[] ar = (getGlobalBlockIndex(pos));
         ChunkManager.Chunk chun = this.getChunkAtPos(pos);
 
         int x = (int)(ar[0] - chun.pos.x * this.size);
@@ -604,9 +608,9 @@ public class ChunkManager : MonoBehaviour {
     }
 
 	public Vector3 getLocalBlockCoords(Vector3 pos){
-		int[] ar = (getGlobalBlockCoords(pos));
+		int[] ar = (getGlobalBlockIndex(pos));
 		ChunkManager.Chunk chun = this.getChunkAtPos(pos);
-
+		Debug.Log (chun.pos);
 		int x = (int)(ar[0] - chun.pos.x * this.size);
 		int y = (int)ar[1] +2;
 		int z = (int)(ar[2] - chun.pos.y * this.size);
@@ -614,13 +618,16 @@ public class ChunkManager : MonoBehaviour {
 		return new Vector3 (x, y, z);
 	}
 
+	//Gets the actual position of a block
     public Vector3 snapCoordsToGrid(Vector3 position)
     {
-        int[] gridPos = getGlobalBlockCoords(position);
-        return new Vector3(gridPos[0] * 0.866f * 2f + Mathf.Abs(gridPos[2] % 2) * 0.866f, gridPos[1] * this.blockSize - 0.002f, gridPos[2] * 1.5f);
+		int[] gridPos = getGlobalBlockIndex(position);
+        return new Vector3(gridPos[0] * 0.866f * 2f + Mathf.Abs(gridPos[2] % 2) * 0.866f, gridPos[1] * this.blockSize, gridPos[2] * 1.5f);
     }
 
-    public int[] getGlobalBlockCoords(Vector3 position)
+
+	//Gets the global (snapped) block index for any given vector
+    public int[] getGlobalBlockIndex(Vector3 position)
     {
 
         int zRound = Mathf.FloorToInt((position.z + 1) / 1.5f);

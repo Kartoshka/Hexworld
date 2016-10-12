@@ -49,21 +49,25 @@ public class BlockSelector : MonoBehaviour {
 
 
             //Snap currently looked at position to a grid point
-            hitBlock = cManager.snapCoordsToGrid(trackedCursor);
-            Vector3 playerPosition = cManager.snapCoordsToGrid(this.gameObject.transform.position);
+			hitBlock = cManager.snapCoordsToGrid(trackedCursor) - new Vector3(0, -0.002f, 0); //Vertical selected block y offset to make it evenly spaced over regular blocks
+            
+			Vector3 playerPosition = cManager.snapCoordsToGrid(this.gameObject.transform.position);
 
             bool canfit = true;
 
+
 			if (!removing) {
-				ChunkManager.Chunk container = cManager.getChunkAtPos (hitBlock);
+				ChunkManager.Chunk container = cManager.getChunkAtPos (hitBlock); //NOT SURE
 
 				for (int f = 0; f < blockSize; f++) {
 					canfit = true;
-					Vector3 originalLocalPos = cManager.getLocalBlockCoords (hitBlock);
+					Vector3 originalLocalPos = cManager.getLocalBlockCoords (hitBlock); //NOT SURE
+
+					Debug.Log (originalLocalPos);
 
 					//Check if there's space for selection
 					for (int i = 0; i < blockSize; i++) {
-						canfit = canfit && (container.blockTypes [(int)originalLocalPos.x, (int)originalLocalPos.z, (int)originalLocalPos.y + i] == (short)BLOCKID.Air);
+						canfit = canfit && (container.blockTypes [(int)originalLocalPos.x, (int)originalLocalPos.z, (int)originalLocalPos.y + i] == (short)BLOCKID.Air); //ERROR OUT OF BOUNDS ON X
 					}
 
 					if (canfit)
@@ -73,6 +77,7 @@ public class BlockSelector : MonoBehaviour {
 					hitBlock += new Vector3 (0, -cManager.blockSize, 0);
 				}
 			}
+
 			canfit = canfit || removing;
 
 
@@ -82,20 +87,22 @@ public class BlockSelector : MonoBehaviour {
                 float maxHeight = playerPosition.y + cManager.blockSize * divisions * 0.5f;
                 float minHeight = playerPosition.y - cManager.blockSize * divisions * 0.5f;
 
-                if (hitBlock.y < minHeight || hitBlock.y > maxHeight)
-                {
-                    blockSelected = true && canfit;
-                }
+				if (hitBlock.y < minHeight || hitBlock.y > maxHeight) {
+					blockSelected = true && canfit;
+				}
             }
             else
             {
                 blockSelected = true && canfit;
             }  
+			//blockSelected = true;
         } 
 		else
 		{
 			blockSelected = false;
 		}
+
+
 
         //Set position of block
         selector.SetActive(blockSelected);
