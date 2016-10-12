@@ -267,6 +267,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trackedObject: {fileID: 1597006540}
+  light_lampO: {fileID: 1000010246401754, guid: 752e1b09c683b9b429e39d073c0a9e8b,
+    type: 2}
   blockMaterials:
   - {fileID: 2100000, guid: 7efac4912dda2d54c894d7265cc4da81, type: 2}
   - {fileID: 2100000, guid: 9ebfe8cc88c1b7a469ca26cb3a928a38, type: 2}

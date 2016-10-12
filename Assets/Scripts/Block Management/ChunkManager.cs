@@ -26,6 +26,10 @@ public class ChunkManager : MonoBehaviour {
 	private GameObject block_crystalO;
 	private GameObject block_lampO;
 
+
+	//Probably temporary, the light object for lampO block
+	public GameObject light_lampO;
+
 	public Material[] blockMaterials;
 
     public AnimationCurve curve;
@@ -338,6 +342,7 @@ public class ChunkManager : MonoBehaviour {
         Mesh finalMesh;
         Transform transform = null;
 		GameObject subChunk = null;
+		GameObject blockLight = null;
 
 		if (b.blockType == (short)BLOCKID.Stone) {
 			//hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
@@ -375,6 +380,8 @@ public class ChunkManager : MonoBehaviour {
 			hObj = block_lampO;
 			hMesh = (Mesh)Instantiate (block_lampO.GetComponent<MeshFilter> ().sharedMesh);
 
+			blockLight = (GameObject)Instantiate(light_lampO);
+
 			subChunk = c.mainHolder.transform.FindChild ("LampOHolder").gameObject;
 		}
 
@@ -392,6 +399,10 @@ public class ChunkManager : MonoBehaviour {
 			transform.localScale = new Vector3 (1, 1, b.vertScale);
 			transform.localPosition = b.pos;
 
+			if (blockLight != null) {
+				blockLight.transform.localPosition = b.pos + new Vector3 (0, 0.125f, 0); //Offset light by half the block height
+				blockLight.transform.parent = subChunk.transform;
+			}
 
 			int yPos = (int)(b.pos.y * 4);
 
