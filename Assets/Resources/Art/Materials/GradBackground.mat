@@ -169,13 +169,13 @@ Material:
       second: {r: 0, g: 0, b: 0, a: 1}
     - first:
         name: _SkyColor1
-      second: {r: 0.3602941, g: 0.6797792, b: 1, a: 0}
+      second: {r: 0.0014597765, g: 0.03364692, b: 0.066176474, a: 0}
     - first:
         name: _SkyColor2
-      second: {r: 0.6691177, g: 0.8905353, b: 1, a: 0}
+      second: {r: 0.029195508, g: 0.093484595, b: 0.14705884, a: 0}
     - first:
         name: _SkyColor3
-      second: {r: 0.4784314, g: 0.82745105, b: 1, a: 0}
+      second: {r: 0.027450982, g: 0.09411766, b: 0.14901961, a: 0}
     - first:
         name: _SunColor
       second: {r: 1, g: 0.99, b: 0.87, a: 1}
