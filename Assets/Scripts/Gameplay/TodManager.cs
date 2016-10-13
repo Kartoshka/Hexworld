@@ -25,16 +25,19 @@ public class TodManager : MonoBehaviour {
 	private Light sunLight;
 	private Light moonLight;
 
-	//top col, horizon col, bottom col, ambient col, fog col
-	public Color[] daytimeCol = new Color[5];
-	public Color[] middayCol = new Color[5];
-	public Color[] nighttimeCol = new Color[5];
-	public Color[] midnightCol = new Color[5];
+	//top col, horizon col, bottom col, ambient col, fog col, sun col
+	private static int numCols = 6;
+	public Color[] daytimeCol = new Color[numCols];
+	public Color[] middayCol = new Color[numCols];
+	public Color[] sunsetCol = new Color[numCols];
+	public Color[] nighttimeCol = new Color[numCols];
+	public Color[] midnightCol = new Color[numCols];
+	public Color[] sunriseCol = new Color[numCols];
 
 	public Material skyMaterial;
 
 	//private Color[] finalCol = new Color[3];
-	private Color[] finalCol = {new Color(92f/255f, 173f/255f, 255f/255f), new Color(171f/255f, 227f/255f, 255f/255f), new Color(122f/255f, 211f/255f, 255f/255f), new Color(198f/255f, 209f/255f, 216f/255f), new Color(133f/255f, 202f/255f, 255f/255f)};
+	private Color[] finalCol = {new Color(92f/255f, 173f/255f, 255f/255f), new Color(171f/255f, 227f/255f, 255f/255f), new Color(122f/255f, 211f/255f, 255f/255f), new Color(198f/255f, 209f/255f, 216f/255f), new Color(133f/255f, 202f/255f, 255f/255f), new Color(255f/255f, 252f/255f, 222f/255f)};
 
 	// Use this for initialization
 	void Start () {
@@ -86,9 +89,16 @@ public class TodManager : MonoBehaviour {
 			sunLight.intensity = 1;
 			moonLight.intensity = 0;
 		}
+		else if (tod <= 0.25f) {
+			for (int i = 0; i < finalCol.Length; i++) {
+				finalCol [i] = Color.Lerp (daytimeCol[i], sunsetCol[i], (tod-0.2f)/0.05f);
+			}
+			sunLight.intensity = 1-((tod-0.2f)/0.1f);
+			moonLight.intensity = ((tod - 0.2f) / 0.1f) * 0.1f;
+		}
 		else if (tod <= 0.3f) {
 			for (int i = 0; i < finalCol.Length; i++) {
-				finalCol [i] = Color.Lerp (daytimeCol[i], nighttimeCol[i], (tod-0.2f)/0.1f);
+				finalCol [i] = Color.Lerp (sunsetCol[i], nighttimeCol[i], (tod-0.25f)/0.05f);
 			}
 			sunLight.intensity = 1-((tod-0.2f)/0.1f);
 			moonLight.intensity = ((tod - 0.2f) / 0.1f) * 0.1f;
@@ -107,9 +117,16 @@ public class TodManager : MonoBehaviour {
 			sunLight.intensity = 0;
 			moonLight.intensity = 0.1f;
 		}
+		else if (tod <= 0.75f) {
+			for (int i = 0; i < finalCol.Length; i++) {
+				finalCol [i] = Color.Lerp (nighttimeCol[i], sunriseCol[i], (tod-0.7f)/0.05f);
+			}
+			sunLight.intensity = (tod-0.7f)/0.1f;
+			moonLight.intensity = (1-((tod-0.7f)/0.1f))*0.1f;
+		}
 		else if (tod <= 0.8f) {
 			for (int i = 0; i < finalCol.Length; i++) {
-				finalCol [i] = Color.Lerp (nighttimeCol[i], daytimeCol[i], (tod-0.7f)/0.1f);
+				finalCol [i] = Color.Lerp (sunriseCol[i], daytimeCol[i], (tod-0.75f)/0.05f);
 			}
 			sunLight.intensity = (tod-0.7f)/0.1f;
 			moonLight.intensity = (1-((tod-0.7f)/0.1f))*0.1f;
@@ -130,6 +147,7 @@ public class TodManager : MonoBehaviour {
 		skyMaterial.SetColor ("_SkyColor1" , col[0]);
 		skyMaterial.SetColor ("_SkyColor2" , col[1]);
 		skyMaterial.SetColor ("_SkyColor3" , col[2]);
+		skyMaterial.SetColor ("_SunColor", col[5]);
 		RenderSettings.ambientLight = col [3];
 		RenderSettings.fogColor = col [4];
 	}
