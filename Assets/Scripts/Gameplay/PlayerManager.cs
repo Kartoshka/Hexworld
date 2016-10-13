@@ -71,7 +71,7 @@ public class PlayerManager : MonoBehaviour {
 
 
 		if (Input.GetButtonDown ("Fire2")) {
-			Debug.Log (inv.getCurrentStack ());
+			//Debug.Log (inv.getCurrentStack ());
 
 			inv.IncrementCurrentStack (1);
 		}

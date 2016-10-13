@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class TodManager : MonoBehaviour {
 
+	float changeDelay = 0.1f; //How often in seconds the lighting will update
+	float nextChangeTime = 0;
+
+	float lastUpdateTime = 0; //Time of the last frame update
+
 	private int cycleLength = 36000;
 
 	private int currentTime;
@@ -12,26 +17,37 @@ public class TodManager : MonoBehaviour {
 
 	public int startTime;
 
-	public int timePerFrame;
+	public float timeFactor; // 1 real second = how many integer time ticks?
 
-	public GameObject sunLight;
-	public GameObject moonLight;
+	public GameObject sunLightObj;
+	public GameObject moonLightObj;
 
-	public Color[] daytimeCol = new Color[3];
-	public Color[] middayCol = new Color[3];
-	public Color[] nighttimeCol = new Color[3];
+	private Light sunLight;
+	private Light moonLight;
+
+	//top col, horizon col, bottom col, ambient col, fog col
+	public Color[] daytimeCol = new Color[5];
+	public Color[] middayCol = new Color[5];
+	public Color[] nighttimeCol = new Color[5];
+	public Color[] midnightCol = new Color[5];
 
 	public Material skyMaterial;
 
 	//private Color[] finalCol = new Color[3];
-	private Color[] finalCol = {new Color(92f/255f, 173f/255f, 255f/255f), new Color(171f/255f, 227f/255f, 255f/255f), new Color(122f/255f, 211f/255f, 255f/255f)};
+	private Color[] finalCol = {new Color(92f/255f, 173f/255f, 255f/255f), new Color(171f/255f, 227f/255f, 255f/255f), new Color(122f/255f, 211f/255f, 255f/255f), new Color(198f/255f, 209f/255f, 216f/255f), new Color(133f/255f, 202f/255f, 255f/255f)};
 
 	// Use this for initialization
 	void Start () {
+		sunLight = sunLightObj.GetComponent<Light> ();
+		moonLight = moonLightObj.GetComponent<Light> ();
+
 		currentTime = startTime;
 
-		calculateSkyCol (finalCol);
+		float tod = (float)currentTime / (float)cycleLength;
+
+		calculateSkyChange (tod, finalCol);
 		setSkyCol (finalCol);
+		setLightRotation (tod);
 	}
 	
 	// Update is called once per frame
@@ -41,39 +57,71 @@ public class TodManager : MonoBehaviour {
 
 	void LateUpdate(){
 		if (cycleDaytime) {
-			currentTime += timePerFrame;
+			currentTime += (int)((Time.time - lastUpdateTime)*timeFactor);
+			lastUpdateTime = Time.time;
 
 			if (currentTime > cycleLength)
 				currentTime -= cycleLength;
 
-			calculateSkyCol (finalCol);
-			setSkyCol (finalCol);
+			float tod = (float)currentTime / (float)cycleLength;
+			if (Time.time > nextChangeTime) { //Obly update the heavy stuff occasionally
+				nextChangeTime += changeDelay;
+
+				calculateSkyChange (tod, finalCol);
+
+				setLightRotation (tod);
+			}
+			setSunVector (tod);
 		}
 	}
 
-	public void calculateSkyCol(Color[] col){
-		float tod = (float)currentTime / (float)cycleLength;
+	public void calculateSkyChange(float tod, Color[] col){
+		
 
-		if (tod <= 0.25f) {
-			for (int i = 0; i < 3; i++) {
-				finalCol [i] = Color.Lerp (daytimeCol[i], middayCol[i], tod/0.25f);
+		if (tod <= 0.2f) {
+			for (int i = 0; i < finalCol.Length; i++) {
+				finalCol [i] = Color.Lerp (middayCol[i], daytimeCol[i], tod/0.2f);
 			}
+			sunLight.intensity = 1;
+			moonLight.intensity = 0;
+		}
+		else if (tod <= 0.3f) {
+			for (int i = 0; i < finalCol.Length; i++) {
+				finalCol [i] = Color.Lerp (daytimeCol[i], nighttimeCol[i], (tod-0.2f)/0.1f);
+			}
+			sunLight.intensity = 1-((tod-0.2f)/0.1f);
+			moonLight.intensity = ((tod - 0.2f) / 0.1f) * 0.1f;
 		}
 		else if (tod <= 0.5f) {
-			for (int i = 0; i < 3; i++) {
-				finalCol [i] = Color.Lerp (middayCol[i], daytimeCol[i], (tod-0.25f)/0.25f);
+			for (int i = 0; i < finalCol.Length; i++) {
+				finalCol [i] = Color.Lerp (nighttimeCol[i], midnightCol[i], (tod-0.3f)/0.2f);
 			}
+			sunLight.intensity = 0;
+			moonLight.intensity = 0.1f;
 		}
-		else if (tod <= 0.55f) {
-			for (int i = 0; i < 3; i++) {
-				finalCol [i] = Color.Lerp (daytimeCol[i], nighttimeCol[i], (tod-0.5f)/0.05f);
+		else if (tod <= 0.7f) {
+			for (int i = 0; i < finalCol.Length; i++) {
+				finalCol [i] = Color.Lerp (midnightCol[i], nighttimeCol[i], (tod-0.5f)/0.2f);
 			}
+			sunLight.intensity = 0;
+			moonLight.intensity = 0.1f;
 		}
-		else if (tod <= 1f) {
-			for (int i = 0; i < 3; i++) {
-				finalCol [i] = Color.Lerp (nighttimeCol[i], daytimeCol[i], (tod-0.95f)/0.05f);
+		else if (tod <= 0.8f) {
+			for (int i = 0; i < finalCol.Length; i++) {
+				finalCol [i] = Color.Lerp (nighttimeCol[i], daytimeCol[i], (tod-0.7f)/0.1f);
 			}
+			sunLight.intensity = (tod-0.7f)/0.1f;
+			moonLight.intensity = (1-((tod-0.7f)/0.1f))*0.1f;
 		}
+		else if (tod <= 1.0f) {
+			for (int i = 0; i < finalCol.Length; i++) {
+				finalCol [i] = Color.Lerp (daytimeCol[i], middayCol[i], (tod-0.8f)/0.2f);
+			}
+			sunLight.intensity = 1;
+			moonLight.intensity = 0;
+		}
+
+		setSkyCol (finalCol);
 	
 	}
 
@@ -81,5 +129,16 @@ public class TodManager : MonoBehaviour {
 		skyMaterial.SetColor ("_SkyColor1" , col[0]);
 		skyMaterial.SetColor ("_SkyColor2" , col[1]);
 		skyMaterial.SetColor ("_SkyColor3" , col[2]);
+		RenderSettings.ambientLight = col [3];
+		RenderSettings.fogColor = col [4];
+	}
+
+	public void setLightRotation(float tod){
+		sunLightObj.transform.eulerAngles = new Vector3(90 + tod * 360, 90, 0);
+		moonLightObj.transform.eulerAngles = new Vector3(270 + tod * 360, 90, 0);
+	}
+
+	public void setSunVector(float tod){
+		skyMaterial.SetVector ("_SunVector", new Vector4(Mathf.Sin(tod*2f*Mathf.PI), Mathf.Cos(tod*2f*Mathf.PI), 0, 0));
 	}
 }
