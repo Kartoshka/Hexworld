@@ -206,7 +206,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cycleDaytime: 1
   startTime: 0
-  timeFactor: 250
+  timeFactor: 100
   sunLightObj: {fileID: 1236647574}
   moonLightObj: {fileID: 981360111}
   daytimeCol:
@@ -577,7 +577,7 @@ MonoBehaviour:
   size: 4
   maxNumBlocks: 512
   blockSize: 0.25
-  gameSeed: 3150
+  gameSeed: 545454834765734658
   octaveZoom:
   - 8
   - 32

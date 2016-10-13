@@ -353,20 +353,17 @@ public class ChunkManager : MonoBehaviour {
 		GameObject blockLight = null;
 
 		if (b.blockType == (short)BLOCKID.Stone) {
-			//hObj = (GameObject)Instantiate(block_stone, new Vector3(0, 0, 0), block_stone.transform.rotation);
 			hObj = block_stone;
 			hMesh = (Mesh)Instantiate (block_stone.GetComponent<MeshFilter> ().sharedMesh);
 			subChunk = c.mainHolder.transform.FindChild ("StoneHolder").gameObject;
 		} 
 		else if (b.blockType == (short)BLOCKID.Dirt) {
-			//hObj = (GameObject)Instantiate(block_dirt, new Vector3(0, 0, 0), block_dirt.transform.rotation);
 			hObj = block_dirt;
 			hMesh = (Mesh)Instantiate (block_dirt.GetComponent<MeshFilter> ().sharedMesh);
 
 			subChunk = c.mainHolder.transform.FindChild ("DirtHolder").gameObject;
 		} 
 		else if (b.blockType == (short)BLOCKID.Grass) {
-			//hObj = (GameObject)Instantiate(block_grass, new Vector3(0, 0, 0), block_grass.transform.rotation);
 			hObj = block_grass;
 			hMesh = (Mesh)Instantiate (block_grass.GetComponent<MeshFilter> ().sharedMesh);
 
@@ -388,7 +385,7 @@ public class ChunkManager : MonoBehaviour {
 			hObj = block_lampO;
 			hMesh = (Mesh)Instantiate (block_lampO.GetComponent<MeshFilter> ().sharedMesh);
 
-			blockLight = (GameObject)Instantiate(light_lampO);
+			blockLight = light_lampO;
 
 			subChunk = c.mainHolder.transform.FindChild ("LampOHolder").gameObject;
 		}
@@ -408,8 +405,11 @@ public class ChunkManager : MonoBehaviour {
 			transform.localPosition = b.pos;
 
 			if (blockLight != null) {
-				blockLight.transform.localPosition = b.pos + new Vector3 (0, 0.125f, 0); //Offset light by half the block height
-				blockLight.transform.parent = subChunk.transform;
+				for (int i = 0; i < (int)(b.vertScale * 4); i++) {
+					GameObject bl = (GameObject)Instantiate (blockLight);
+					bl.transform.localPosition = b.pos + new Vector3 (0, 0.125f + i*(0.25f), 0); //Offset light by half the block height
+					bl.transform.parent = subChunk.transform;
+				}
 			}
 
 			int yPos = (int)(b.pos.y * 4);
@@ -481,40 +481,6 @@ public class ChunkManager : MonoBehaviour {
 
 
 	#region UVScaling
-    //Scale the UV coordinates of a block's mesh
-	//DEPRICATED
-	/*
-    private void scaleUV(GameObject obj)
-    {
-		//int ypos = (int)obj.transform.position.y;
-
-		//float yOffset = 0.125f * (((int)obj.transform.position.y) % 8);
-		//Debug.Log (yOffset);
-
-        obj.GetComponent<MeshFilter>().sharedMesh = Instantiate(obj.GetComponent<MeshFilter>().sharedMesh);
-        Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
-        Vector3[] vertices = mesh.vertices;
-        Vector2[] uvs = new Vector2[vertices.Length];
-
-
-        for (int i = 0; i < uvs.Length; i++)
-        {
-            uvs[i][0] = mesh.uv[i][0];
-
-			if (mesh.uv [i] [0] <= 0.5) { //If vertices pertaining to vertical faces
-				if (mesh.uv [i] [1] == 0.5) { //If top vertices
-					uvs [i] [1] = 0.5f * obj.transform.localScale [2];
-				} else { //Bottom vertices
-					uvs [i] [1] = mesh.uv [i] [1];
-				}
-				//uvs [i] [1] += yOffset;
-			}
-        }
-
-        mesh.uv = uvs;
-
-    }
-    */
 
 	//Scale UV coordinates of a mesh instead of a gameobject, used for more optimied chunk generation
 	private void scaleUV(Mesh mesh,Vector3 localScale, int yPos){

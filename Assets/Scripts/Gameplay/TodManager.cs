@@ -48,6 +48,7 @@ public class TodManager : MonoBehaviour {
 		calculateSkyChange (tod, finalCol);
 		setSkyCol (finalCol);
 		setLightRotation (tod);
+		setSunVector (tod);
 	}
 	
 	// Update is called once per frame

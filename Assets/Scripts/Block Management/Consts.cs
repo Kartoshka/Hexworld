@@ -12,8 +12,6 @@ namespace Consts {
 
 public class ConstsClass {
 
-
-
 	private static string[] fileNames = { "HB_Air", "HB_Stone", "HB_Dirt", "HB_Grass", "HB_StoneTile", "HB_CrystalO", "HB_LampO" };
 
 	private static string[] iconNames = { "Icon_Air", "Icon_Stone", "Icon_Dirt", "Icon_Grass" , "Icon_StoneTile", "Icon_CrystalO", "Icon_LampO"};

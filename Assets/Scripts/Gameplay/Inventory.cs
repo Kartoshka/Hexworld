@@ -83,8 +83,7 @@ namespace InventoryManager{
 		}
 
 		public void IncrementCurrentStack(int amount){
-			if(this.getSelection().blockId != BLOCKID.LampO)
-				this.getSelection ().stack = this.getSelection ().stack + amount;
+			this.getSelection ().stack = this.getSelection ().stack + amount;
 			if (ui != null) {
 				ui.UpdateValues ();
 			}
