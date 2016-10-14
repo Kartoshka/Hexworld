@@ -72,6 +72,9 @@ public class ChunkManager : MonoBehaviour {
     Dictionary<Vector2, Chunk> loadedChunks;
 	Dictionary<Vector2, bool> generatingChunks;
 
+	//In-game persistence
+	Dictionary<Vector2, Chunk> persistentChunks;
+
     private Vector2 currentChunkPos;
 
     public AbChunkModifier[] chunkModifiers;
@@ -100,6 +103,9 @@ public class ChunkManager : MonoBehaviour {
 
         loadedChunks = new Dictionary<Vector2, Chunk>();
 		generatingChunks = new Dictionary<Vector2, bool> ();
+		loadedChunks = new Dictionary<Vector2, Chunk>();
+
+		persistentChunks = new Dictionary<Vector2, Chunk> ();
         
 		if (chunkModifiers == null)
         {
@@ -157,118 +163,118 @@ public class ChunkManager : MonoBehaviour {
     {
 		generatingChunks.Add (cPos, true);
 
-        short[,,] blockValues = new short[size, size, maxNumBlocks];
+		Chunk result = new Chunk ();
 
-        int chunkX = Mathf.FloorToInt(cPos.x);
-        int chunkZ = Mathf.FloorToInt(cPos.y);
+		if (persistentChunks.ContainsKey (cPos)) {
+			
+			Chunk pChunk = persistentChunks[cPos];
+			persistentChunks.Remove (cPos);
+
+			result.blocks = pChunk.blocks;
+			result.blockTypes = pChunk.blockTypes;
+		} else {
+
+			short[,,] blockValues = new short[size, size, maxNumBlocks];
+
+			int chunkX = Mathf.FloorToInt (cPos.x);
+			int chunkZ = Mathf.FloorToInt (cPos.y);
 
 
-        float deltaX = (float)chunkX * (size * xDistanceBlocks);
-        float deltaZ = (float)chunkZ * (size * zDistanceBlocks);
+			float deltaX = (float)chunkX * (size * xDistanceBlocks);
+			float deltaZ = (float)chunkZ * (size * zDistanceBlocks);
 
-		List<Block> blocks = new List<Block> ();
+			List<Block> blocks = new List<Block> ();
 
-		AnimationCurve densityMixFactor_copy = new AnimationCurve(densityMixFactor.keys);
-		AnimationCurve densityCurve_mountains_copy = new AnimationCurve(densityCurve_mountains.keys);
-		AnimationCurve densityCurve_plains_copy = new AnimationCurve(densityCurve_plains.keys);
-		AnimationCurve densityCurve_caves_copy = new AnimationCurve(densityCurve_caves.keys);
+			AnimationCurve densityMixFactor_copy = new AnimationCurve (densityMixFactor.keys);
+			AnimationCurve densityCurve_mountains_copy = new AnimationCurve (densityCurve_mountains.keys);
+			AnimationCurve densityCurve_plains_copy = new AnimationCurve (densityCurve_plains.keys);
+			AnimationCurve densityCurve_caves_copy = new AnimationCurve (densityCurve_caves.keys);
 
-        //First pass for main stone generation
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
 
-                float blockX = i * 0.866f * 2.0f + (j % 2) * 0.866f + deltaX;
-                float blockZ = j * 1.5f + deltaZ;
+			//First pass for main stone generation
+			for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size; j++) {
 
-                short prev = (short)BLOCKID.Air;
-                int dirtCount = 0;
+					float blockX = i * 0.866f * 2.0f + (j % 2) * 0.866f + deltaX;
+					float blockZ = j * 1.5f + deltaZ;
 
-				int blockStart = 0;
+					short prev = (short)BLOCKID.Air;
+					int dirtCount = 0;
 
-                for (int k = maxNumBlocks - 1; k >= 0; k--)
-                {
+					int blockStart = 0;
+
+					for (int k = maxNumBlocks - 1; k >= 0; k--) {
                     
-                    float heightFactor = (float)k / (float)maxNumBlocks;
+						float heightFactor = (float)k / (float)maxNumBlocks;
 
-                    float mixValue = densityMixFactor_copy.Evaluate(Mathf.PerlinNoise(blockX*pScale_mix + pOff_mix + pOff, blockZ*pScale_mix + pOff_mix + pOff));
-                    float heightOffset = 0.3f*Mathf.PerlinNoise(blockX * pScale_height + pOff_height + pOff, blockZ * pScale_height + pOff_height + pOff);
+						float mixValue = densityMixFactor_copy.Evaluate (Mathf.PerlinNoise (blockX * pScale_mix + pOff_mix + pOff, blockZ * pScale_mix + pOff_mix + pOff));
+						float heightOffset = 0.3f * Mathf.PerlinNoise (blockX * pScale_height + pOff_height + pOff, blockZ * pScale_height + pOff_height + pOff);
 
-                    float mountainValue = densityCurve_mountains_copy.Evaluate(heightFactor - heightOffset);
-                    float plainsValue = densityCurve_plains_copy.Evaluate(heightFactor - heightOffset);
-                    float cavesValue = densityCurve_caves_copy.Evaluate(heightFactor);
+						float mountainValue = densityCurve_mountains_copy.Evaluate (heightFactor - heightOffset);
+						float plainsValue = densityCurve_plains_copy.Evaluate (heightFactor - heightOffset);
+						float cavesValue = densityCurve_caves_copy.Evaluate (heightFactor);
 
-                    float biomeCombineValue = ((1-mixValue) * mountainValue) + ((mixValue) * plainsValue);
+						float biomeCombineValue = ((1 - mixValue) * mountainValue) + ((mixValue) * plainsValue);
 				
 
-					double chanceOfBlock = 0.0f;
-					double weightSum = 0;
+						double chanceOfBlock = 0.0f;
+						double weightSum = 0;
 
-					for (int n = 0; n < noise.Length; n++)
-                    {
-						double newWeight = octaveWeights[n]*0.5f + octaveWeights[n]*Mathf.PerlinNoise(blockX*pScale_octaves + (float)octaveSeeds[n] + pOff, blockZ*pScale_octaves + (float)octaveSeeds[n] + pOff);
-						chanceOfBlock += noise[n].Evaluate(blockX*(1f/octaveZoom[n]), (float)k * blockSize*(1f/octaveZoom[n]), blockZ*(1f/octaveZoom[n])) * newWeight;
-                        weightSum += newWeight;
-                    }
-
-                    chanceOfBlock = chanceOfBlock / weightSum;
-
-                    int grassCutoff = maxNumBlocks / 2 - 30;
-                    
-
-                    if (chanceOfBlock < biomeCombineValue && chanceOfBlock < cavesValue)
-                    {
-
-                        if (prev == (short)BLOCKID.Air && k > grassCutoff)
-                        {
-                            blockValues[i, j, k] = (short)BLOCKID.Grass;
-                        }
-                        else if (prev == (short)BLOCKID.Grass || (prev == (short)BLOCKID.Dirt && dirtCount < 5))
-                        {
-                            blockValues[i, j, k] = (short)BLOCKID.Dirt;
-                            dirtCount++;
-                        }
-                        else
-                        {
-							if (crystalONoise.Evaluate (blockX * 0.2f, (float)k * blockSize * 0.2f, blockZ * 0.2f) < 0.6)
-								blockValues [i, j, k] = (short)BLOCKID.Stone;
-							else
-								blockValues [i, j, k] = (short)BLOCKID.CrystalO;
-							
-                            dirtCount = 0;
-                        }
-                    }
-                    else
-                    {
-                        blockValues[i, j, k] = (short)BLOCKID.Air;
-						dirtCount = 0;
-                    }
-
-
-					if (blockValues[i, j, k] != prev || k == 0)
-					{
-						if (prev != (short)BLOCKID.Air)
-						{
-							blocks.Add(new Block(new Vector3(blockX, k * blockSize, blockZ), (blockStart-k) * blockSize, prev));
+						for (int n = 0; n < noise.Length; n++) {
+							double newWeight = octaveWeights [n] * 0.5f + octaveWeights [n] * Mathf.PerlinNoise (blockX * pScale_octaves + (float)octaveSeeds [n] + pOff, blockZ * pScale_octaves + (float)octaveSeeds [n] + pOff);
+							chanceOfBlock += noise [n].Evaluate (blockX * (1f / octaveZoom [n]), (float)k * blockSize * (1f / octaveZoom [n]), blockZ * (1f / octaveZoom [n])) * newWeight;
+							weightSum += newWeight;
 						}
 
-						blockStart = k;
+						chanceOfBlock = chanceOfBlock / weightSum;
+
+						int grassCutoff = maxNumBlocks / 2 - 30;
+                    
+
+						if (chanceOfBlock < biomeCombineValue && chanceOfBlock < cavesValue) {
+
+							if (prev == (short)BLOCKID.Air && k > grassCutoff) {
+								blockValues [i, j, k] = (short)BLOCKID.Grass;
+							} else if (prev == (short)BLOCKID.Grass || (prev == (short)BLOCKID.Dirt && dirtCount < 5)) {
+								blockValues [i, j, k] = (short)BLOCKID.Dirt;
+								dirtCount++;
+							} else {
+								if (crystalONoise.Evaluate (blockX * 0.2f, (float)k * blockSize * 0.2f, blockZ * 0.2f) < 0.6)
+									blockValues [i, j, k] = (short)BLOCKID.Stone;
+								else
+									blockValues [i, j, k] = (short)BLOCKID.CrystalO;
+							
+								dirtCount = 0;
+							}
+						} else {
+							blockValues [i, j, k] = (short)BLOCKID.Air;
+							dirtCount = 0;
+						}
+
+
+						if (blockValues [i, j, k] != prev || k == 0) {
+							if (prev != (short)BLOCKID.Air) {
+								blocks.Add (new Block (new Vector3 (blockX, k * blockSize, blockZ), (blockStart - k) * blockSize, prev));
+							}
+
+							blockStart = k;
+						}
+
+
+						prev = blockValues [i, j, k];
 					}
+				}
+			}
 
 
-                    prev = blockValues[i, j, k];
-                }
-            }
-        }
+			result.blocks = blocks;
+			result.blockTypes = blockValues;
 
-		Chunk result = new Chunk();
-		result.blocks = blocks;
-        result.blockTypes = blockValues;
-        result.size = size;
-        result.pos = cPos;
+		}
 
-        //loadedChunks.Add(cPos, result);
+		result.size = size;
+		result.pos = cPos;
+        
 
         return result;
     }
@@ -316,8 +322,12 @@ public class ChunkManager : MonoBehaviour {
 
 		c.hexObjs = new List<GameObject>();
 
-		foreach (Block b in c.blocks) {
-			addBlockToMesh (b, c, true,false);
+//		foreach (Block b in c.blocks) {
+//			addBlockToMesh (b, c, true,false);
+//		}
+
+		for (int i = 0; i < c.blocks.Count; i++) {
+			addBlockToMesh (c.blocks[i], c, true,false);
 		}
 
 		//Update the colliders. In reality we want to do this a little as possible because we're using meshcolliders and those do not like being changed.
@@ -443,6 +453,7 @@ public class ChunkManager : MonoBehaviour {
 		this.gameObject.transform.rotation = originalRotation;
 		this.gameObject.transform.SetParent (originalParent);
 
+
 		if (deleteOriginal) {
 			DestroyImmediate (hMesh);
         } else {
@@ -461,10 +472,13 @@ public class ChunkManager : MonoBehaviour {
 			return false;
 		}
 
+		//NEEDS REVISION
+
 		if (chun.blockTypes [(int)localCoords.x, (int)localCoords.z, (int)localCoords.y] == (short)b.blockType) {
 			return true;
 		} else {
 			if(addBlockToMesh(b,c,deleteOriginal,updateCollider)){
+				c.blocks.Add (b);
 				chun.blockTypes [(int)localCoords.x, (int)localCoords.z, (int)localCoords.y] = (short)b.blockType;
 				return true;
 			}
@@ -530,6 +544,7 @@ public class ChunkManager : MonoBehaviour {
     {
         if (loadedChunks.ContainsKey(pos)) {
             Chunk c = loadedChunks[pos];
+
             if (c.hexObjs != null)
             {
                 foreach(GameObject obj in c.hexObjs)
@@ -552,7 +567,10 @@ public class ChunkManager : MonoBehaviour {
 				Destroy (child.gameObject);
 			}
 			Destroy (c.mainHolder);
+
+			persistentChunks.Add(pos, c);
         }
+			
         return loadedChunks.Remove(pos);
     }
 

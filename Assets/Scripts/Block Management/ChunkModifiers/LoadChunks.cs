@@ -132,7 +132,7 @@ public class LoadChunks : AbChunkModifier
 
 		for (int c = 0; c < chunks.Count; c++) {
 			Vector2 pos = new Vector2 (startX + chunks [c] [0], startZ + chunks [c] [1]);
-            lock (requests)
+            lock (requestLock)
             {
 
                 if (!currentlyGenerating.ContainsKey(pos) && chunks[c][2] < radius + 0.5 && !cManager.chunkIsLoaded(pos) && !cManager.chunkIsGenerating(pos)&& !requests.Contains(pos))

@@ -68,6 +68,7 @@ public class TodManager : MonoBehaviour {
 				currentTime -= cycleLength;
 
 			float tod = (float)currentTime / (float)cycleLength;
+
 			if (Time.time > nextChangeTime) { //Obly update the heavy stuff occasionally
 				nextChangeTime += changeDelay;
 
@@ -75,6 +76,7 @@ public class TodManager : MonoBehaviour {
 
 				setLightRotation (tod);
 			}
+
 			setSunVector (tod);
 		}
 	}

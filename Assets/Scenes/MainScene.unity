@@ -119,8 +119,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae03018aecc9c0d47abefdb9321e1bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
-  startRadius: 8
+  radius: 24
+  startRadius: 12
   numThreads: 1
 --- !u!4 &26337148
 Transform:
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d277adbb36be64eafacbcb23ed310b7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unloadPastDistance: 24
+  unloadPastDistance: 32
   delayToUnloadAssets: 10
 --- !u!4 &203889928
 Transform:
