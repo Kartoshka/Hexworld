@@ -35,46 +35,60 @@ public class ChunkManager : MonoBehaviour {
     public AnimationCurve curve;
     public AnimationCurve curve2;
 
-    //For future generation implementation
+    //Curves that define the landscape
     public AnimationCurve densityCurve_plains;
     public AnimationCurve densityCurve_mountains;
     public AnimationCurve densityCurve_caves;
     public AnimationCurve densityMixFactor;
 
+
+	//Size of a chunk square
     public int size = 16;
+	//Height of a chunk, also maxHeight
     public int maxNumBlocks = 512;
+	//height of one single block, in world units
     public float blockSize = 0.25f;
+
+	//SEEDS
     public long gameSeed;
 
-	public float[] octaveZoom =  { 1f, 5f, 10f};
+	//OCTAVE PROPERTIES
+	public float[] octaveZoom =  { 8f, 32f, 128f};
     public float[] octaveWeights = { 1, 2, 3};
     public long[] octaveSeeds = { 57131, 16447, 486132};
 
-	public OpenSimplexNoise[] noise;
+	//PROPORTIONALITY CONSTANTS FOR 2D PERLIN NOISE MAPS
+	public float pScale = 0.02f;
+	public float pScale2 = 0.008f;
 
+
+	public float pScale_octaves = 0.01f;
+	public float pScale_height = 0.008f;
+	public float pScale_mix = 0.0075f;
+	public float pOff_height = 6969f;
+	public float pOff_mix = 1337f;
+
+
+	private float pOff = 100000f;
+	//NOISE FUNCTIONS
+	//Octave noise
+	public OpenSimplexNoise[] noise;
+	//Crystal noise
 	private OpenSimplexNoise crystalONoise;
 
-    public float pScale = 0.02f;
-    public float pScale2 = 0.008f;
 
-    public float pScale_octaves = 0.01f;
-    public float pScale_height = 0.008f;
-    public float pScale_mix = 0.0075f;
-    public float pOff_height = 6969f;
-    public float pOff_mix = 1337f;
-    
-
-    private float pOff = 100000f;
 
     [SerializeField]
     private List<Chunk> chunks;
 
+	//Currently loaded chunks
     Dictionary<Vector2, Chunk> loadedChunks;
+	//Flags to prevent duplicate block generation by multiple threads
 	Dictionary<Vector2, bool> generatingChunks;
-
 	//In-game persistence
 	Dictionary<Vector2, Chunk> persistentChunks;
 
+	//Chunk on which player currently is on
     private Vector2 currentChunkPos;
 
     public AbChunkModifier[] chunkModifiers;
@@ -103,8 +117,6 @@ public class ChunkManager : MonoBehaviour {
 
         loadedChunks = new Dictionary<Vector2, Chunk>();
 		generatingChunks = new Dictionary<Vector2, bool> ();
-		loadedChunks = new Dictionary<Vector2, Chunk>();
-
 		persistentChunks = new Dictionary<Vector2, Chunk> ();
         
 		if (chunkModifiers == null)
@@ -322,9 +334,6 @@ public class ChunkManager : MonoBehaviour {
 
 		c.hexObjs = new List<GameObject>();
 
-//		foreach (Block b in c.blocks) {
-//			addBlockToMesh (b, c, true,false);
-//		}
 
 		for (int i = 0; i < c.blocks.Count; i++) {
 			addBlockToMesh (c.blocks[i], c, true,false);
@@ -400,9 +409,7 @@ public class ChunkManager : MonoBehaviour {
 			subChunk = c.mainHolder.transform.FindChild ("LampOHolder").gameObject;
 		}
 
-		Mesh[] twoMeshes = { hMesh, subChunk.GetComponent<MeshFilter> ().sharedMesh };
-
-
+		Mesh[] twoMeshes = {hMesh, subChunk.GetComponent<MeshFilter> ().sharedMesh };
 
 		if (hMesh != null) {
 			
@@ -417,7 +424,7 @@ public class ChunkManager : MonoBehaviour {
 			if (blockLight != null) {
 				for (int i = 0; i < (int)(b.vertScale * 4); i++) {
 					GameObject bl = (GameObject)Instantiate (blockLight);
-					bl.transform.localPosition = b.pos + new Vector3 (0, 0.125f + i*(0.25f), 0); //Offset light by half the block height
+					bl.transform.localPosition = b.pos + new Vector3 (0, blockSize*0.25f + i*(blockSize*0.5f), 0); //Offset light by half the block height
 					bl.transform.parent = subChunk.transform;
 				}
 			}
@@ -489,8 +496,43 @@ public class ChunkManager : MonoBehaviour {
 		}
 	}
 
+	public bool removeBlock(Vector3 worldGridPosition,int heightOfBlock){
+		Chunk c = this.getChunkAtPos (worldGridPosition);
+		Vector3 b = this.getLocalBlockCoords (worldGridPosition);
+
+		if (c.blockTypes [(int)b.x, (int)b.y, (int)b.z] == (short)BLOCKID.Air) {
+			return false;
+		}
+
+		int xLocal = (int)b.x;
+		int yLocal = (int)b.y;
+		int zLocal = (int)b.z;
+		//Do this only for the top and lowermost parts of the block
+		BLOCKID blockType = (BLOCKID)c.blockTypes [xLocal, yLocal,zLocal];
+		short blockShort = (short)blockType;
+
+		int indexLowerBlock = yLocal;
+		while (indexLowerBlock >= 0 && c.blockTypes [xLocal, indexLowerBlock-1, zLocal] == blockShort) {
+			indexLowerBlock--;
+		}
+		int heightLowerBlock = yLocal - indexLowerBlock;
+
+		int indexUpperBlock = yLocal + heightOfBlock;
+		int heightUpperBlock = yLocal;
+
+		while (heightUpperBlock < maxNumBlocks && c.blockTypes [xLocal, heightUpperBlock + 1, zLocal] == blockSize) {
+			heightUpperBlock++;
+		}
+
+		Block lower = new Block (new Vector3 (xLocal, indexLowerBlock, zLocal), heightLowerBlock * blockSize, blockShort);
+		Block upper = new Block (new Vector3 (xLocal, indexUpperBlock, zLocal), heightUpperBlock * blockSize, blockShort);
+		//Delete vertices, triangles, and block data from chunk
+		//TODO
+
+		return true;
 
 
+	}
 	#endregion
 
 
