@@ -3,8 +3,8 @@ Procedurally generated Minecraft-style terrain using hextiles instead of square 
 (CREATED IN UNITY VERSION 5.0b3, will most likely break if imported with previous versions) 
 
 ## Terrain
-![Img1](http://i.imgur.com/aQuZsrC.png)
-![Img2](http://i.imgur.com/mSEQ9OL.png)
+![Img1](http://i.imgur.com/IiZ6m6W.png)
+![Img2](http://imgur.com/IiZ6m6W.png)
 ![Img3](http://i.imgur.com/lUudYQQ.png)
 
 ## Caves
